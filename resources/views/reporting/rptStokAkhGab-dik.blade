@@ -1,0 +1,82 @@
+//1. ambil distinct lokasi yang ada volume/transaksi
+
+        $lokasi = DB::select(DB::raw("
+            SELECT v.nama_lokasi AS nama_lokasi ,v.kode_lokasi
+            FROM (
+                SELECT a.lokasi_tpn AS lokasiTpn, a.jns_kayu, 
+                CASE WHEN a.kelas = '40-49' THEN 1 ELSE 0 END AS low, CASE WHEN a.kelas = '40-49' THEN a.vol ELSE 0 END AS lowVol, 
+                CASE WHEN a.kelas = '50-59' THEN 1 ELSE 0 END AS middle, CASE WHEN a.kelas = '50-59' THEN a.vol 
+                ELSE 0 END AS middleVol, CASE WHEN a.kelas = '60 Up' THEN 1 ELSE 0 END AS high, CASE WHEN a.kelas = '60 Up' 
+                THEN a.vol ELSE 0 END AS highVol FROM tr_detail_tpn_in a 
+                WHERE a.position = 'current' AND a.tgl_input_tpn <= '2023-01-27' UNION ALL SELECT tdp.to_lokasi AS lokasiTpn, tdti.jns_kayu AS kode_kayu, 
+                CASE WHEN tdti.kelas = '40-49' THEN 1 ELSE 0 END AS low, 
+                CASE WHEN tdti.kelas = '40-49' THEN tdti.vol ELSE 0 END AS lowVol, 
+                CASE WHEN tdti.kelas = '50-59' THEN 1 ELSE 0 END AS middle, 
+                CASE WHEN tdti.kelas = '50-59' THEN tdti.vol ELSE 0 END AS middleVol, 
+                CASE WHEN tdti.kelas = '60 Up' THEN 1 ELSE 0 END AS high, CASE WHEN tdti.kelas = '60 Up' 
+                THEN tdti.vol ELSE 0 END AS highVol FROM tr_detail_position tdp LEFT JOIN tr_detail_tpn_in tdti ON tdp.no_btg = tdti.no_btg 
+                WHERE tdp.position = 'current' AND tdp.tgl_input <= '2023-01-27') e 
+            LEFT JOIN mstr_kayu k ON e.jns_kayu = k.kode_kayu 
+            LEFT JOIN mstr_lokasi v ON e.lokasiTpn = v.kode_lokasi 
+            GROUP BY v.nama_lokasi,v.kode_lokasi 
+            ORDER BY v.nama_lokasi ASC
+            "));
+
+        $count_lokasi=0;
+        $count=1;
+        //set variable untuk grand total-> sample aja 1 dulu
+        $grandTotalVol=0;
+
+        //looping lokasi dan looping stock
+        foreach($lokasi as $items){
+            echo $count. '. '.$items->nama_lokasi.'<br>';
+            $report = DB::select(DB::raw("
+                    SELECT   
+                        k.nama_kayu AS namakayu, SUM(e.low) AS lowQty, 
+                        ROUND(SUM(e.lowVol),2) AS lowVol, SUM(e.middle) AS middleQty, 
+                        ROUND(SUM(e.middleVol),2) AS middleVol, 
+                        SUM(e.high) AS highQty, ROUND(SUM(e.highVol),2) AS highVol, 
+                        SUM(e.low)+SUM(e.middle)+SUM(e.high) AS totalQty, 
+                        ROUND(SUM(e.lowVol)+SUM(e.middleVol)+SUM(e.highVol),2) AS totalVol 
+                    FROM (  SELECT a.lokasi_tpn AS lokasiTpn, a.jns_kayu, 
+                        CASE WHEN a.kelas = '40-49' THEN 1 ELSE 0 END AS low, CASE WHEN a.kelas = '40-49' THEN a.vol ELSE 0 END AS lowVol, 
+                        CASE WHEN a.kelas = '50-59' THEN 1 ELSE 0 END AS middle, CASE WHEN a.kelas = '50-59' THEN a.vol 
+                        ELSE 0 END AS middleVol, CASE WHEN a.kelas = '60 Up' THEN 1 ELSE 0 END AS high, CASE WHEN a.kelas = '60 Up' 
+                        THEN a.vol ELSE 0 END AS highVol FROM tr_detail_tpn_in a 
+                        WHERE a.position = 'current' AND a.tgl_input_tpn <= '2023-01-27' UNION ALL SELECT tdp.to_lokasi AS lokasiTpn, tdti.jns_kayu AS kode_kayu, 
+                        CASE WHEN tdti.kelas = '40-49' THEN 1 ELSE 0 END AS low, 
+                        CASE WHEN tdti.kelas = '40-49' THEN tdti.vol ELSE 0 END AS lowVol, 
+                        CASE WHEN tdti.kelas = '50-59' THEN 1 ELSE 0 END AS middle, 
+                        CASE WHEN tdti.kelas = '50-59' THEN tdti.vol ELSE 0 END AS middleVol, 
+
+                        CASE WHEN tdti.kelas = '60 Up' THEN 1 ELSE 0 END AS high, CASE WHEN tdti.kelas = '60 Up' 
+                        THEN tdti.vol ELSE 0 END AS highVol FROM tr_detail_position tdp LEFT JOIN tr_detail_tpn_in tdti ON tdp.no_btg = tdti.no_btg 
+                        WHERE tdp.position = 'current' AND tdp.tgl_input <= '2023-01-27') e 
+                    LEFT JOIN mstr_kayu k ON e.jns_kayu = k.kode_kayu
+                    WHERE  e.lokasiTpn ='$items->kode_lokasi'
+                    GROUP BY  k.nama_kayu 
+                "));
+            
+            $countSub=1;
+            $jmlReportPerItem = count($report);
+            $subTotalVol=0;
+            foreach($report as $itemReport){
+                $subTotalVol +=$itemReport->totalVol;
+                echo '&nbsp;&nbsp;&nbsp;&nbsp;'.$countSub. '-'.$itemReport->namakayu.'- Vol:'.$itemReport->totalVol.'<br>';
+                if($countSub==$jmlReportPerItem){
+                    //tampilkan jumlah
+                    echo '&nbsp;&nbsp;&nbsp;&nbsp;SUBtotal:'.$subTotalVol;
+                    echo '<br>====================================================================<br>';
+
+                    //tambahkan nilai grand total vol
+                    $grandTotalVol +=$subTotalVol;
+                }
+                $countSub++;
+            }
+            
+         $count++;
+
+        }
+
+                    echo 'GRAND TOTAL VOLUME .' .$grandTotalVol;
+        exit;
