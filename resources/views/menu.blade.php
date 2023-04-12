@@ -25,8 +25,8 @@
         <ul class="nav nav-pills nav-sidebar text-sm nav-child-indent flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
-            <a href="#" class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian') ? 'nav-link active' : 'nav-link' }}">
+          <li class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian','supplier','warehouse','merkBrg') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+            <a href="#" class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian','supplier','warehouse','merkBrg') ? 'nav-link active' : 'nav-link' }}">
               <i class="nav-icon fas fa-cogs"></i>
               <p>
                 Master
@@ -62,6 +62,24 @@
                 <a href="{{ route('sts_pemakaian') }}" class="{{ request()->is('sts_pemakaian') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Status Pemakaian</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('supplier') }}" class="{{ request()->is('supplier') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Supplier</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('warehouse') }}" class="{{ request()->is('warehouse') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Warehouse</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('merkBrg') }}" class="{{ request()->is('merkBrg') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Merk Barang</p>
                 </a>
               </li>
             </ul>

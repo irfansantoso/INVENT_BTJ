@@ -8,6 +8,9 @@ use App\Http\Controllers\Master\MerkController;
 use App\Http\Controllers\Master\FixedAssetController;
 use App\Http\Controllers\Master\AktivitasAlatController;
 use App\Http\Controllers\Master\StsPemakaianController;
+use App\Http\Controllers\Master\SupplierController;
+use App\Http\Controllers\Master\WarehouseController;
+use App\Http\Controllers\Master\MerkBrgController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +54,15 @@ Route::post('aktivitasAlat', [AktivitasAlatController::class, 'aktivitasAlat_add
 
 Route::get('sts_pemakaian',[StsPemakaianController::class, 'sts_pemakaian'])->name('sts_pemakaian')->middleware('auth');
 Route::post('sts_pemakaian', [StsPemakaianController::class, 'sts_pemakaian_add'])->name('sts_pemakaian.add')->middleware('auth');
+
+Route::get('supplier',[SupplierController::class, 'supplier_browse'])->name('supplier')->middleware('auth');
+Route::post('supplier', [SupplierController::class, 'supplier_add'])->name('supplier.add')->middleware('auth');
+
+Route::get('warehouse',[WarehouseController::class, 'warehouse_browse'])->name('warehouse')->middleware('auth');
+Route::post('warehouse', [WarehouseController::class, 'warehouse_add'])->name('warehouse.add')->middleware('auth');
+
+Route::get('merkBrg',[MerkBrgController::class, 'merkBrg_browse'])->name('merkBrg')->middleware('auth');
+Route::post('merkBrg', [MerkBrgController::class, 'merkBrg_add'])->name('merkBrg.add')->middleware('auth');
 
 Route::get('kayu',[UserController::class, 'kayu'])->name('kayu')->middleware('auth');
 Route::post('kayu', [UserController::class, 'kayu_add'])->name('kayu.add')->middleware('auth');
