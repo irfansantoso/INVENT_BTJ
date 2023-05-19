@@ -86,8 +86,8 @@
           </li>
           
         
-          <li class="{{ request()->is('trHeaderTpnLm','trDetailTpnLm/*','trHeaderTpnLmOut','trDetailTpnLmOut/*','trHeaderTpnAqua','trDetailTpnAqua/*','trHeaderTpnAquaOut','trDetailTpnAquaOut/*','trHeaderTpk49OutLSD','trDetailTpk49OutLSD/*','trHeaderTpkAquaOutLSD','trDetailTpkAquaOutLSD/*','trHeaderSangaiDrtOutSangaiAir','trDetailSangaiDrtOutSangaiAir/*','trHeaderSangaiAirOutTanjung','trDetailSangaiAirOutTanjung/*','trHeaderSangaiAirOutHanj','trDetailSangaiAirOutHanj/*','trHeaderSangaiDrtOutTanjung','trDetailSangaiDrtOutTanjung/*','trHeaderTanjungOutKabuauDrt','trDetailTanjungOutKabuauDrt/*','trHeaderKabuauDrtOutKabuauAir','trDetailKabuauDrtOutKabuauAir/*','trHeaderKabuauAirOutTongkang','trDetailKabuauAirOutTongkang/*','trHeaderKabuauAirOutHanj','trDetailKabuauAirOutHanj/*','trHeaderKabuauDrtOutTongkang','trDetailKabuauDrtOutTongkang/*','trHeaderHanjaOutTongkang','trDetailHanjaOutTongkang/*','trTongkang','trLogListTkg/*','trHistory','periodeOperasional','users') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
-            <a href="#" class="{{ request()->is('trHeaderTpnLm','trDetailTpnLm/*','trHeaderTpnLmOut','trDetailTpnLmOut/*','trHeaderTpnAqua','trDetailTpnAqua/*','trHeaderTpnAquaOut','trDetailTpnAquaOut/*','trHeaderTpk49OutLSD','trDetailTpk49OutLSD/*','trHeaderTpkAquaOutLSD','trDetailTpkAquaOutLSD/*','trHeaderSangaiDrtOutSangaiAir','trDetailSangaiDrtOutSangaiAir/*','trHeaderSangaiAirOutTanjung','trDetailSangaiAirOutTanjung/*','trHeaderSangaiAirOutHanj','trDetailSangaiAirOutHanj/*','trHeaderSangaiDrtOutTanjung','trDetailSangaiDrtOutTanjung/*','trHeaderTanjungOutKabuauDrt','trDetailTanjungOutKabuauDrt/*','trHeaderKabuauDrtOutKabuauAir','trDetailKabuauDrtOutKabuauAir/*','trHeaderKabuauAirOutTongkang','trDetailKabuauAirOutTongkang/*','trHeaderKabuauAirOutHanj','trDetailKabuauAirOutHanj/*','trHeaderKabuauDrtOutTongkang','trDetailKabuauDrtOutTongkang/*','trHeaderHanjaOutTongkang','trDetailHanjaOutTongkang/*','trTongkang','trLogListTkg/*','trHistory','periodeOperasional','users') ? 'nav-link active' : 'nav-link' }}">
+          <li class="{{ request()->is('trHeaderSaldoAwal','trDetailSaldoAwal/*','trHeaderTpnLm','trDetailTpnLm/*','trHeaderTpnLmOut','trDetailTpnLmOut/*','trHeaderTpnAqua','trDetailTpnAqua/*','trHeaderTpnAquaOut','trDetailTpnAquaOut/*','trHeaderTpk49OutLSD','trDetailTpk49OutLSD/*','trHeaderTpkAquaOutLSD','trDetailTpkAquaOutLSD/*','trHeaderSangaiDrtOutSangaiAir','trDetailSangaiDrtOutSangaiAir/*','trHeaderSangaiAirOutTanjung','trDetailSangaiAirOutTanjung/*','trHeaderSangaiAirOutHanj','trDetailSangaiAirOutHanj/*','trHeaderSangaiDrtOutTanjung','trDetailSangaiDrtOutTanjung/*','trHeaderTanjungOutKabuauDrt','trDetailTanjungOutKabuauDrt/*','trHeaderKabuauDrtOutKabuauAir','trDetailKabuauDrtOutKabuauAir/*','trHeaderKabuauAirOutTongkang','trDetailKabuauAirOutTongkang/*','trHeaderKabuauAirOutHanj','trDetailKabuauAirOutHanj/*','trHeaderKabuauDrtOutTongkang','trDetailKabuauDrtOutTongkang/*','trHeaderHanjaOutTongkang','trDetailHanjaOutTongkang/*','trTongkang','trLogListTkg/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+            <a href="#" class="{{ request()->is('trHeaderSaldoAwal','trDetailSaldoAwal/*','trHeaderTpnLm','trDetailTpnLm/*','trHeaderTpnLmOut','trDetailTpnLmOut/*','trHeaderTpnAqua','trDetailTpnAqua/*','trHeaderTpnAquaOut','trDetailTpnAquaOut/*','trHeaderTpk49OutLSD','trDetailTpk49OutLSD/*','trHeaderTpkAquaOutLSD','trDetailTpkAquaOutLSD/*','trHeaderSangaiDrtOutSangaiAir','trDetailSangaiDrtOutSangaiAir/*','trHeaderSangaiAirOutTanjung','trDetailSangaiAirOutTanjung/*','trHeaderSangaiAirOutHanj','trDetailSangaiAirOutHanj/*','trHeaderSangaiDrtOutTanjung','trDetailSangaiDrtOutTanjung/*','trHeaderTanjungOutKabuauDrt','trDetailTanjungOutKabuauDrt/*','trHeaderKabuauDrtOutKabuauAir','trDetailKabuauDrtOutKabuauAir/*','trHeaderKabuauAirOutTongkang','trDetailKabuauAirOutTongkang/*','trHeaderKabuauAirOutHanj','trDetailKabuauAirOutHanj/*','trHeaderKabuauDrtOutTongkang','trDetailKabuauDrtOutTongkang/*','trHeaderHanjaOutTongkang','trDetailHanjaOutTongkang/*','trTongkang','trLogListTkg/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-link active' : 'nav-link' }}">
               <i class="nav-icon fas fa-book"></i>
               <p>
                 Inputan
@@ -95,6 +95,26 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              <li class="{{ request()->is('trHeaderSaldoAwal','trDetailSaldoAwal/*','trHeaderTpnLmOut','trDetailTpnLmOut/*') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+                <a href="#" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Penerimaan<i class="fas fa-angle-left right"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{ route('trHeaderSaldoAwal') }}" class="{{ request()->is('trHeaderSaldoAwal','trDetailSaldoAwal/*') ? 'nav-link active' : 'nav-link' }}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Saldo Awal </p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ route('trHeaderTpnLmOut') }}" class="{{ request()->is('trHeaderTpnLmOut','trDetailTpnLmOut/*') ? 'nav-link active' : 'nav-link' }}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>OUT - TPK 49</p>
+                    </a>
+                  </li>                  
+                </ul>
+              </li>
               <li class="{{ request()->is('trHeaderTpnLm','trDetailTpnLm/*','trHeaderTpnLmOut','trDetailTpnLmOut/*') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
                 <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -232,6 +252,18 @@
                 </ul>
               </li>
               <hr>
+              <li class="nav-item">
+                <a href="{{ route('stInvent') }}" class="{{ request()->is('stInvent') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Stock Invent</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('processQty') }}" class="{{ request()->is('processQty') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Process Qty</p>
+                </a>
+              </li>
               <li class="nav-item">
                 <a href="{{ route('trHistory') }}" class="{{ request()->is('trHistory') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>

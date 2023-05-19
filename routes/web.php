@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SaldoAwalController;
+use App\Http\Controllers\StInventController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProcessQtyController;
 use App\Http\Controllers\Master\JnsAlatController;
 use App\Http\Controllers\Master\LokasiController;
 use App\Http\Controllers\Master\MerkController;
@@ -78,6 +81,26 @@ Route::get('keperluan',[UserController::class, 'keperluan'])->name('keperluan')-
 Route::get('helper',[UserController::class, 'helper'])->name('helper')->middleware('auth');
 Route::post('helper', [UserController::class, 'helper_add'])->name('helper.add')->middleware('auth');
 Route::post('keperluan', [UserController::class, 'keperluan_add'])->name('keperluan.add')->middleware('auth');
+
+Route::get('trHeaderSaldoAwal',[SaldoAwalController::class, 'trHeaderSaldoAwal'])->name('trHeaderSaldoAwal')->middleware('auth');
+Route::get('trHeaderSaldoAwal/json', [SaldoAwalController::class, 'trHeaderSaldoAwal_data'])->name('trHeaderSaldoAwal.data')->middleware('auth');
+Route::post('trHeaderSaldoAwal', [SaldoAwalController::class, 'trHeaderSaldoAwal_add'])->name('trHeaderSaldoAwal.add')->middleware('auth');
+Route::post('trHeaderSaldoAwal/delete/', [SaldoAwalController::class, 'trHeaderSaldoAwalDestroy_del'])->name('trHeaderSaldoAwalDestroy.del')->middleware('auth');
+
+Route::get('trDetailSaldoAwal/{id_header_tpn_in}', [SaldoAwalController::class, 'trDetailSaldoAwal'])->name('trDetailSaldoAwal')->middleware('auth');
+Route::post('trDetailSaldoAwal', [SaldoAwalController::class, 'trDetailSaldoAwal_add'])->name('trDetailSaldoAwal.add')->middleware('auth');
+// Route::post('trDetailSaldoAwal/edit', [SaldoAwalController::class, 'trDetailSaldoAwal_edit'])->name('trDetailSaldoAwal.edit')->middleware('auth');
+// Route::post('trDetailSaldoAwal/delete/', [SaldoAwalController::class, 'trDetailSaldoAwal_del'])->name('trDetailSaldoAwal.del')->middleware('auth');
+
+Route::get('stInvent',[StInventController::class, 'stInvent'])->name('stInvent')->middleware('auth');
+Route::get('stInvent/json', [StInventController::class, 'stInvent_data'])->name('stInvent.data')->middleware('auth');
+Route::get('stInvent/showedit/{id}', [StInventController::class, 'showEdit'])->name('stInvent.showEdit')->middleware('auth');
+Route::post('stInvent', [StInventController::class, 'stInvent_add'])->name('stInvent.add')->middleware('auth');
+Route::post('stInvent/edit', [StInventController::class, 'stInvent_edit'])->name('stInvent.edit')->middleware('auth');
+Route::post('stInvent/delete/', [StInventController::class, 'stInvent_del'])->name('stInvent.del')->middleware('auth');
+
+Route::get('processQty',[ProcessQtyController::class, 'processQty'])->name('processQty')->middleware('auth');
+
 Route::get('trHistory',[UserController::class, 'trHistory'])->name('trHistory')->middleware('auth');
 Route::get('trHistory/json', [UserController::class, 'trHistory_data'])->name('trHistory.data')->middleware('auth');
 Route::get('periodeOperasional',[UserController::class, 'periodeOperasional'])->name('periodeOperasional')->middleware('auth');
