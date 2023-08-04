@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class TrHeaderSaldoAwal extends Model
+class TrHeaderPb extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,15 +17,20 @@ class TrHeaderSaldoAwal extends Model
      * @var array<int, string>
      */
     // public $timestamps = false;
-    protected $table = 'tr_header_saldo_awal';
+    protected $table = 'tr_header_pb';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'no_ref',
-        'no_sppb',
-        'supplier',
+        'no_pb',
         'kd_area',
+        'kd_unit',
+        'status_pb',
+        'kepada',
+        'camp_manager',
+        'kepala_gudang',
+        'kepala_mekanik',
+        'mekanik',
         'kode_periode',
-        'tgl_sa',
+        'tgl_pb',
         'user_created'
     ];
 }

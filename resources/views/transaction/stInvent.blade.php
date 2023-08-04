@@ -17,13 +17,15 @@
         <p class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">×</button>{{ $error }}</p>
       @endforeach
     @endif
+
+    @auth
+    @if(Auth::user()->level == "administrator")
     <div class="card card">
       <div class="card-header">
         <h3 class="card-title">Add Form</h3>
       </div>
       <!-- /.card-header -->
-      <!-- form start -->
-
+      <!-- form start -->      
       <form class="form-horizontal" action="{{ route('stInvent.add') }}" method="POST">
          @csrf        
         <div class="card-body">          
@@ -57,6 +59,12 @@
                   <input type="text" class="form-control" name="ukuran">                
               </div>
             </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Qty</label>                
+                  <input type="text" class="form-control" name="qty_inv">                
+              </div>
+            </div>
             <div class="col-sm-1">
               <div class="form-group">
                 <label>UOM</label>                
@@ -82,6 +90,12 @@
                   <input type="text" class="form-control" name="status">                
               </div>
             </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Max Qty</label>                
+                  <input type="text" class="form-control" name="max_qty">                
+              </div>
+            </div>
           </div>
         <!-- /.card-body -->
         </div>
@@ -91,6 +105,8 @@
         <!-- /.card-footer -->
       </form>              
     </div>
+    @endif
+    @endauth
       <!-- /.card -->
     
     <div class="card">
@@ -150,6 +166,33 @@
                       Apakah Anda yakin akan menghapus
                       <span id="dakod"></span> ?
                       <input type='hidden' name='del_id' id='id-destroy'>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Tidak</button>
+                      <button type="submit" class="btn btn-danger">Ya</button>
+                  </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal-openlock" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Warning !!!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('stInvent.openlock') }}" method="post">
+                  {{ csrf_field() }}
+                  <div class="modal-body">
+                      Apakah Anda yakin akan membuka lock stock kode barang ini
+                      <span id="opkod"></span> ?
+                      <input type='hidden' name='openlock_kdbrg' id='id-openlock'>
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Tidak</button>
@@ -234,6 +277,13 @@ $(document).on('click', '.delStInvent', function() {
     let dakod = $(this).attr('data-kode');
     $('#id-destroy').val(id);
     $('#dakod').html(dakod);
+});
+
+$(document).on('click', '.oplockStInvent', function() {
+    let id_opl = $(this).attr('data-id');
+    let opkod = $(this).attr('data-kode');
+    $('#id-openlock').val(opkod);
+    $('#opkod').html(opkod);    
 });
 </script> 
 @stop

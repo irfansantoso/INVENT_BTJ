@@ -18,9 +18,19 @@ class ProcessQtyController extends Controller
         ProcessQty::truncate();
 
         DB::insert('INSERT into temp_qty (kd_brg,qty)
-                    SELECT kd_brg, sum(qty) as qtysum
-                    FROM tr_detail_saldo_awal
-                    GROUP by kd_brg');
+                    SELECT kd_brg, sum(qty_sum) as qtysum
+                    FROM 
+                    (
+                        select kd_brg, sum(qty) as qty_sum
+                        from tr_detail_saldo_awal
+                        GROUP by kd_brg
+                        union all
+                        select kd_brg, qty_inv as qty_sum
+                        from tr_invent_stock
+                    ) tab_temp
+                    WHERE qty_sum is not null
+                    GROUP by kd_brg
+                    ');
 
         return redirect()->route('stInvent')->with('success', 'Process Qty Sukses!');
     }    

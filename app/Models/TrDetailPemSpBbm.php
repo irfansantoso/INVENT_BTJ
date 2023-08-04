@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class TrDetailSaldoAwal extends Model
+class TrDetailPemSpBbm extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,17 +17,21 @@ class TrDetailSaldoAwal extends Model
      * @var array<int, string>
      */
     // public $timestamps = false;
-    protected $table = 'tr_detail_saldo_awal';
+    protected $table = 'tr_detail_pem_sp_bbm';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'id_head_sa',
+        'id_head_p_spbbm',
         'kd_brg',
         'part_numb',
         'qty',
         'uom',
         'harga_satuan',
         'total',
-        'tgl_det_sa',        
+        'kd_fa',
+        'kd_sts',
+        'kode_periode',
+        'tgl_det_p_spbbm',
+        'keterangan',        
         'user_created'
     ];
 }

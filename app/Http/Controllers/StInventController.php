@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\StInvent;
 use App\Models\GabJnsAlatMerk;
 use App\Models\MerkBrg;
+use App\Models\ProcessQty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ class StInventController extends Controller
     public function stInvent_data(Request $request)
     {
         // $data = StInvent::query();
-      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg) as tis"));
+      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty, temp_qty.lock_pb as lockPb FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg) as tis"));
       // $data = StInvent::leftJoin('temp_qty as tq', 'tq.kd_brg','=','tr_invent_stock.kd_brg')
       //                               ->get(['tr_invent_stock.*','tq.qty as qty']);
 
@@ -44,8 +45,13 @@ class StInventController extends Controller
                                 data-id="'.$data->id.'"
                                 class="edit btn btn-primary btn-sm editStInvent" title="Edit"><i class="far fa-edit"></i></a>';
                     $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-kode="'.$data->kd_brg.'" class="btn btn-danger btn-sm delStInvent" title="Delete"><i class="fa fa-trash"></i></a>';
-                    }
+
+                      if($data->lockPb==1){
+                        $btn .= '<a href="#" data-toggle="modal" data-target="#modal-openlock" data-id="'.$data->id.'" data-kode="'.$data->kd_brg.'" class="btn btn-link btn-sm oplockStInvent" title="openlock"><i class="fa fa-unlock-alt"></i></a>';
+                      }
                     return $btn;
+                    }
+                    
                 })
                 ->rawColumns(['action'])
                 // ->toJson();
@@ -64,9 +70,11 @@ class StInventController extends Controller
             'kel_brg' => $request->kel_brg,
             'part_numb' => $request->part_numb,
             'ukuran' => $request->ukuran,
+            'qty_inv' => $request->qty_inv,
             'uom' => $request->uom,
             'merk' => $request->merk,
-            'status' => $request->status
+            'status' => $request->status,
+            'max_qty' => $request->max_qty,
         ]);
         $stInvent->save();
         return redirect()->route('stInvent')->with('success', 'Tambah data sukses!');
@@ -120,6 +128,12 @@ class StInventController extends Controller
                   <input type="text" class="form-control" name="ukuran" value="'.$stcInvent->ukuran.'">                
               </div>
             </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Qty</label>                
+                  <input type="text" class="form-control" name="qty_inv" value="'.$stcInvent->qty_inv.'">                
+              </div>
+            </div>
             <div class="col-sm-1">
               <div class="form-group">
                 <label>UOM</label>                
@@ -140,6 +154,12 @@ class StInventController extends Controller
                   <input type="text" class="form-control" name="status" value="'.$stcInvent->status.'">                
               </div>
             </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Max Qty</label>                
+                  <input type="text" class="form-control" name="max_qty" value="'.$stcInvent->max_qty.'">                
+              </div>
+            </div>
           </div>
         </div>
         <div class="card-footer">
@@ -158,9 +178,11 @@ class StInventController extends Controller
         StInvent::where('id', $request->idM)
                   ->update(['part_numb' => $request->part_numb,
                             'ukuran' => $request->ukuran,
+                            'qty_inv' => $request->qty_inv,
                             'uom' => $request->uom,
                             'merk' => $request->merk,
-                            'status' => $request->status
+                            'status' => $request->status,
+                            'max_qty' => $request->max_qty,
                             ]);
         return redirect()->route('stInvent')->with('success', 'Edit data sukses!');
     }
@@ -172,6 +194,23 @@ class StInventController extends Controller
             StInvent::where('id', $request->del_id)->delete();
             DB::commit();
             return back()->with('success',' Data deleted successfully');
+        }catch(\Exception $e){
+            DB::rollback();
+            return back()->with('error',' There is some problem, please try again or call your admin!');
+        }
+    }
+
+    public function stInvent_openlock(Request $request)
+    {      
+      
+        DB::beginTransaction();
+        try{
+            // echo $request->openlock_kdbrg;
+            // exit();
+            ProcessQty::where('kd_brg', $request->openlock_kdbrg)
+                ->update(['lock_pb' => 0]);
+            DB::commit();
+            return redirect()->route('stInvent')->with('success', 'Edit data sukses!');
         }catch(\Exception $e){
             DB::rollback();
             return back()->with('error',' There is some problem, please try again or call your admin!');

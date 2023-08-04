@@ -19,38 +19,32 @@
     @endif
     <div class="card card-primary">
       <div class="card-header">
-        <h3 class="card-title">Header Saldo Awal</h3>
+        <h3 class="card-title">Pemakaian</h3>
       </div>
       <!-- /.card-header -->
       <!-- form start -->
 
-      <form class="form-horizontal" action="{{ route('trHeaderSaldoAwal.add') }}" method="POST">
+      <form class="form-horizontal" action="{{ route('trHeaderPemakaianBbm.add') }}" method="POST">
          @csrf        
-        <div class="card-body">          
+        <div class="card-body">
           <div class="row">
             <div class="col-sm-3">
               <div class="form-group">
                 <label>No Ref</label>
-                  <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139/{{ App\Http\Controllers\SaldoAwalController::getNewNoRef('0139'); }}" autofocus>
+                  <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139{{ App\Http\Controllers\PemakaianBbmController::getNewNoRef('0139'); }}" autofocus>
               </div>
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>No SPPB</label>
-                  <input type="text" class="form-control" id="no_sppb" name="no_sppb" placeholder="" value="{{ App\Http\Controllers\SaldoAwalController::getNewNoSppb('0139'); }}">
-              </div>
-            </div>
-            <div class="col-sm-2">
-              <div class="form-group">
-                <label>Tanggal</label>
-                  <input type="text" class="form-control" name="tgl_sa" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
+                <label>No BPM</label>
+                  <input type="text" class="form-control" id="no_bpm" name="no_bpm" placeholder="" value="">
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-2">
               <div class="form-group">
-                <label>Kode Area</label>                
+                <label>Area</label>                
                   <select class="form-control" name="kd_area" id="kd_area" style="width: 100%;">
                     <option value="0139">CAMP BTJ</option>
                     <option value="0100">PUSAT BTJ</option>
@@ -60,16 +54,15 @@
             </div>            
             <div class="col-sm-3">
               <div class="form-group">
-                <label>Supplier</label>
-                  <select class="form-control select2" name="supplier" id="supplier" style="width: 100%;">
-                    <option value="" selected="selected">-- Supplier --</option>
-                    @foreach ($supplier as $sp)
-                      <option value="{{ $sp->kode_supp }}">{{ $sp->nama_supp }}</option>
+                <label>Lokasi</label>
+                  <select class="form-control select2" name="loc_activity" id="loc_activity" style="width: 100%;">
+                    <option value="" selected="selected">-- Lokasi --</option>
+                    @foreach ($lokasi as $lk)
+                      <option value="{{ $lk->kode_lokasi }}">{{ $lk->nama_lokasi }}</option>
                     @endforeach
                   </select>
               </div>
-            </div>
-           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\UserController::getKodePeriodeOperasional(); }}">             
+            </div>        
           </div>
         <!-- /.card-body -->
         </div>
@@ -84,14 +77,12 @@
     <div class="card">
       <!-- /.card-header -->
       <div class="card-body">
-        <table id="trHeaderSaldoAwal" class="table table-bordered table-striped">
+        <table id="trHeaderPemakaianBbm" class="table table-bordered table-striped">
           <thead>
           <tr>
             <th>No Ref</th>
-            <th>No SPPB</th>  
-            <th>Supplier</th>          
-            <th>Kode Area</th>            
-            <th>Tanggal SA</th>
+            <th>No BPM</th>  
+            <th>Area</th>          
             <th>Action</th>
           </tr>
           </thead>
@@ -131,17 +122,11 @@
 <script type="text/javascript">
 //$('.select2-basic').select2();
 
-$('#kel_brg').on('change', function (e) { 
-    var kel_brg = $('#kel_brg').find(':selected').data('gjam');
-    // var kel_brg = document.getElementById('kel_brg');
-    $('#kd_brg').val(kel_brg);
-});
-
-$('#trHeaderSaldoAwal').DataTable({
+$('#trHeaderPemakaianBbm').DataTable({
   responsive: true,
   processing: true,
   serverSide: true,
-  ajax: '{!! route('trHeaderSaldoAwal.data') !!}', // memanggil route yang menampilkan data json
+  ajax: '{!! route('trHeaderPemakaianBbm.data') !!}', // memanggil route yang menampilkan data json
   columns: 
   [
     { // mengambil & menampilkan kolom sesuai tabel database
@@ -149,21 +134,13 @@ $('#trHeaderSaldoAwal').DataTable({
         name: 'no_ref'
     },
     {
-        data: 'no_sppb',
-        name: 'no_sppb'
-    },
-    {
-        data: 'ns',
-        name: 'ns'
+        data: 'no_bpm',
+        name: 'no_bpm'
     },
     {
         data: 'kd_area',
         name: 'kd_area'
     },
-    {
-        data: 'tgl_sa',
-        name: 'tgl_sa'
-    }, 
     {
         data: 'action',
         name: 'action',

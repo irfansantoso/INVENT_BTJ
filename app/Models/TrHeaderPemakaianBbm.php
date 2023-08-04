@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class StInvent extends Model
+class TrHeaderPemakaianBbm extends Model
 {
-
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -17,19 +16,15 @@ class StInvent extends Model
      *
      * @var array<int, string>
      */
-
-    protected $table = 'tr_invent_stock';
+    // public $timestamps = false;
+    protected $table = 'tr_header_pemakaian_bbm';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'kd_brg',
-        'kel_brg',
-        'part_numb',
-        'ukuran',
-        'qty_inv',
-        'uom',
-        'merk',
-        'status'        
+        'no_ref',
+        'no_bpm',
+        'kd_area',
+        'tgl_p_bbm',
+        'loc_activity',
+        'user_created'
     ];
-    
-    
 }

@@ -22,7 +22,8 @@ class ProcessQty extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'kd_brg',
-        'qty'       
+        'qty',
+        'lock_pb'
     ];
     
     
