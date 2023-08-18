@@ -86,8 +86,8 @@
           </li>
           
         
-          <li class="{{ request()->is('trHeaderPb','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPemakaianBbm','trDetailPemBbm/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
-            <a href="#" class="{{ request()->is('trHeaderPb','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPemakaianBbm','trDetailPemBbm/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-link active' : 'nav-link' }}">
+          <li class="{{ request()->is('trHeaderPb','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trHeaderPemakaianBbm','trDetailPemBbm/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+            <a href="#" class="{{ request()->is('trHeaderPb','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trHeaderPemakaianBbm','trDetailPemBbm/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-link active' : 'nav-link' }}">
               <i class="nav-icon fas fa-book"></i>
               <p>
                 Inputan
@@ -115,7 +115,7 @@
                   </li>                  
                 </ul>
               </li>
-              <li class="{{ request()->is('trHeaderPemakaianSpBbm','trDetailPemSpBbm/*') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+              <li class="{{ request()->is('trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
                 <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Pengeluaran SP<i class="fas fa-angle-left right"></i></p>
@@ -124,9 +124,15 @@
                   <li class="nav-item">
                     <a href="{{ route('trHeaderPemakaianSpBbm') }}" class="{{ request()->is('trHeaderPemakaianSpBbm','trDetailPemSpBbm/*') ? 'nav-link active' : 'nav-link' }}">
                       <i class="far fa-circle nav-icon"></i>
-                      <p>Pemakaian </p>
+                      <p>21 - Pemakaian </p>
                     </a>
-                  </li>                  
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ route('trHeaderPinGudSpBbm') }}" class="{{ request()->is('trHeaderPinGudSpBbm','trDetailPemSpBbm/*') ? 'nav-link active' : 'nav-link' }}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>23 - Pindah Gudang </p>
+                    </a>
+                  </li>                
                 </ul>
               </li>
               <li class="{{ request()->is('trHeaderPemakaianBbm','trDetailPemBbm/*') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">

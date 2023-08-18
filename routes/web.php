@@ -7,6 +7,7 @@ use App\Http\Controllers\StInventController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProcessQtyController;
 use App\Http\Controllers\PemakaianSpBbmController;
+use App\Http\Controllers\PinGudSpBbmController;
 use App\Http\Controllers\PemakaianBbmController;
 use App\Http\Controllers\Master\JnsAlatController;
 use App\Http\Controllers\Master\LokasiController;
@@ -117,12 +118,27 @@ Route::post('trHeaderPemakaianSpBbm/delete/', [PemakaianSpBbmController::class, 
 Route::get('trDetailPemSpBbm/{id}', [PemakaianSpBbmController::class, 'trDetailPemSpBbm'])->name('trDetailPemSpBbm')->middleware('auth');
 // Route::get('trDetailPemSpBbm/showinv', [PemakaianSpBbmController::class, 'showInv'])->name('trDetailPemSpBbm.showInv')->middleware('auth');
 Route::get('stInvSpBbm/json', [PemakaianSpBbmController::class, 'stInvSpBbm_data'])->name('stInvSpBbm.data')->middleware('auth');
+Route::get('stInvSpBbmx/json', [PemakaianSpBbmController::class, 'stInvSpBbm_data_x'])->name('stInvSpBbmx.data')->middleware('auth');
 Route::post('trDetailPemSpBbm', [PemakaianSpBbmController::class, 'trDetailPemSpBbm_add'])->name('trDetailPemSpBbm.add')->middleware('auth');
+Route::get('trDetailPemSpBbm/showedit/{id}', [PemakaianSpBbmController::class, 'showEdit'])->name('trDetailPemSpBbm.showEdit')->middleware('auth');
+Route::post('trDetailPemSpBbm/edit', [PemakaianSpBbmController::class, 'trDetailPemSpBbm_edit'])->name('trDetailPemSpBbm.edit')->middleware('auth');
+Route::post('trDetailPemSpBbm/delete/', [PemakaianSpBbmController::class, 'trDetailPemSpBbm_del'])->name('trDetailPemSpBbm.del')->middleware('auth');
+
+Route::get('trHeaderPinGudSpBbm',[PinGudSpBbmController::class, 'trHeaderPinGudSpBbm'])->name('trHeaderPinGudSpBbm')->middleware('auth');
+Route::get('trHeaderPinGudSpBbm/json', [PinGudSpBbmController::class, 'trHeaderPinGudSpBbm_data'])->name('trHeaderPinGudSpBbm.data')->middleware('auth');
+Route::post('trHeaderPinGudSpBbm', [PinGudSpBbmController::class, 'trHeaderPinGudSpBbm_add'])->name('trHeaderPinGudSpBbm.add')->middleware('auth');
+Route::post('trHeaderPinGudSpBbm/delete/', [PinGudSpBbmController::class, 'trHeaderPinGudSpBbmDestroy_del'])->name('trHeaderPinGudSpBbmDestroy.del')->middleware('auth');
 
 Route::get('trHeaderPemakaianBbm',[PemakaianBbmController::class, 'trHeaderPemakaianBbm'])->name('trHeaderPemakaianBbm')->middleware('auth');
 Route::get('trHeaderPemakaianBbm/json', [PemakaianBbmController::class, 'trHeaderPemakaianBbm_data'])->name('trHeaderPemakaianBbm.data')->middleware('auth');
 Route::post('trHeaderPemakaianBbm', [PemakaianBbmController::class, 'trHeaderPemakaianBbm_add'])->name('trHeaderPemakaianBbm.add')->middleware('auth');
 Route::post('trHeaderPemakaianBbm/delete/', [PemakaianBbmController::class, 'trHeaderPemakaianBbmDestroy_del'])->name('trHeaderPemakaianBbmDestroy.del')->middleware('auth');
+
+Route::get('trDetailPemBbm/{id}', [PemakaianBbmController::class, 'trDetailPemBbm'])->name('trDetailPemBbm')->middleware('auth');
+// Route::get('trDetailPemBbm/showinv', [PemakaianBbmController::class, 'showInv'])->name('trDetailPemBbm.showInv')->middleware('auth');
+Route::get('stInvBbm/json', [PemakaianBbmController::class, 'stInvBbm_data'])->name('stInvBbm.data')->middleware('auth');
+Route::post('trDetailPemBbm', [PemakaianBbmController::class, 'trDetailPemBbm_add'])->name('trDetailPemBbm.add')->middleware('auth');
+Route::post('trDetailPemBbm/delete/', [PemakaianBbmController::class, 'trDetailPemBbm_del'])->name('trDetailPemBbm.del')->middleware('auth');
 
 Route::get('stInvent',[StInventController::class, 'stInvent'])->name('stInvent')->middleware('auth');
 Route::get('stInvent/json', [StInventController::class, 'stInvent_data'])->name('stInvent.data')->middleware('auth');

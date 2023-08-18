@@ -17,6 +17,15 @@ use Session;
 
 class PindahGudangController extends Controller
 {
+    public static function getKodePeriodeOperasional()
+    {
+        $getNPO = DB::table('periode_operasional')
+                        ->select('kode_periode')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
+        return $jsonx[0]['kode_periode'];
+    }
+
     public static function getNewNoRef($kd_area)
     {
         $getNPO = DB::table('periode_operasional')
@@ -84,7 +93,12 @@ class PindahGudangController extends Controller
     public function trHeaderPindahGudang_data(Request $request)
     {
         // $data = TrHeaderPindahGudang::query();
+        $getNPO = DB::table('periode_operasional')
+                        ->select('*')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
         $data =  TrHeaderPindahGudang::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
+                                    ->where('tr_header_saldo_awal.kode_periode',$jsonx[0]['kode_periode'])
                                     ->get(['tr_header_saldo_awal.*','ms.nama_supp as ns']);
 
         return Datatables::of($data)
@@ -112,7 +126,7 @@ class PindahGudangController extends Controller
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        if($request->tgl_pb < $jsonx[0]['awal_tgl'] || $request->tgl_pb > $jsonx[0]['akhir_tgl'])
+        if($request->tgl_sa < $jsonx[0]['awal_tgl'] || $request->tgl_sa > $jsonx[0]['akhir_tgl'])
         {
            return redirect()->route('trHeaderPindahGudang')->with('error', 'Tanggal tidak sesuai dengan tahun periode!'); 
         }
@@ -154,7 +168,7 @@ class PindahGudangController extends Controller
         $stInvent = StInvent::all();
         // $stInvent = StInvent::where('id_head_sa','=',$request->del_id)->get();
         $getDetailSa = TrDetailPindahGudang::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_saldo_awal.kd_brg')                                    
-                                    ->where('tr_detail_saldo_awal.id','=',$id_header_saldo_awal)
+                                    ->where('tr_detail_saldo_awal.id_head_sa','=',$id_header_saldo_awal)
                                     ->get(['tr_detail_saldo_awal.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran']);
  
         $data['title'] = 'Detail Pindah Gudang';

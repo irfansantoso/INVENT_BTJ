@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class TrDetailPemSpBbm extends Model
+class TrDetailPemBbm extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,21 +17,26 @@ class TrDetailPemSpBbm extends Model
      * @var array<int, string>
      */
     // public $timestamps = false;
-    protected $table = 'tr_detail_pem_sp_bbm';
+    protected $table = 'tr_detail_pem_bbm';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'id_head_p_spbbm',
+        'id_head_p_bbm',
         'kd_brg',
-        'tgl_det_p_spbbm',
-        'part_numb',
-        'kd_fa',
-        'qty',
-        'total',
-        'hrg_beli',
+        'jns_alat',
+        'jumlah',
         'uom',
-        'kd_sts',
-        'kode_periode',        
-        'keterangan',        
+        'hrg_beli',        
+        'kd_fa',
+        'sts_pakai',
+        'tgl_det_p_bbm',
+        'hmkm_awal',
+        'hmkm_akhir',
+        'krj_alat',
+        'rata_rata',
+        'kode_lokasi',
+        'kode_akv',
+        'keterangan',
+        'kode_periode',
         'user_created'
     ];
 }

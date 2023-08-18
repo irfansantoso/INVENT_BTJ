@@ -70,7 +70,7 @@
                   </select>
               </div>
             </div>
-           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\UserController::getKodePeriodeOperasional(); }}">             
+           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\PindahGudangController::getKodePeriodeOperasional(); }}">             
           </div>
         <!-- /.card-body -->
         </div>

@@ -18,14 +18,22 @@ class ProcessQtyController extends Controller
         ProcessQty::truncate();
 
         DB::insert('INSERT into temp_qty (kd_brg,qty)
-                    SELECT kd_brg, sum(qty_sum) as qtysum
+                    SELECT kd_brg, sum(qty_sum)-sum(qty_bbm)-sum(qty_spbbm) as qtysum
                     FROM 
                     (
-                        select kd_brg, sum(qty) as qty_sum
+                        select kd_brg, sum(qty) as qty_sum, 0 as qty_bbm, 0 as qty_spbbm
                         from tr_detail_saldo_awal
                         GROUP by kd_brg
                         union all
-                        select kd_brg, qty_inv as qty_sum
+                        SELECT kd_brg, 0 as qty_sum, 0 as qty_bbm, sum(qty) as qty_spbbm
+                        from tr_detail_pem_sp_bbm
+                        GROUP by kd_brg
+                        union all
+                        SELECT kd_brg, 0 as qty_sum, sum(jumlah) as qty_bbm, 0 as qty_spbbm
+                        from tr_detail_pem_bbm
+                        GROUP by kd_brg
+                        union all
+                        select kd_brg, qty_inv as qty_sum, 0 as qty_bbm, 0 as qty_spbbm
                         from tr_invent_stock
                     ) tab_temp
                     WHERE qty_sum is not null

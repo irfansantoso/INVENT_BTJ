@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\TrHeaderPemakaianSpBbm;
+use App\Models\TrHeaderPinGudSpBbm;
 use App\Models\TrDetailPemSpBbm;
 use App\Models\StInvent;
 use App\Models\StsPemakaian;
@@ -17,7 +17,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Session;
 
-class PemakaianSpBbmController extends Controller
+class PinGudSpBbmController extends Controller
 {
     public static function getKodePeriodeOperasional()
     {
@@ -37,17 +37,17 @@ class PemakaianSpBbmController extends Controller
         return $jsonx[0]['tahun_periode'];
     }
     
-    public static function getNewNoRef($kd_area)
+    public static function getNewNoRef($from_kd_area)
     {
         $getNPO = DB::table('periode_operasional')
                         ->select('kode_periode')->where('status_periode','1')
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        $getLastNo = DB::table('tr_header_pemakaian_sp_bbm')
+        $getLastNo = DB::table('tr_header_pg_sp_bbm')
                         ->select('no_ref')
                         ->where('kode_periode','=',$jsonx[0]['kode_periode'])
-                        ->where('kd_area','=',$kd_area)
+                        ->where('from_kd_area','=',$from_kd_area)
                         ->orderBy('no_ref','desc')
                         ->get();        
 
@@ -64,24 +64,24 @@ class PemakaianSpBbmController extends Controller
         }        
     }
 
-    public static function getNewNoBpm($kd_area)
+    public static function getNewNoBpm($from_kd_area)
     {
         $getNPO = DB::table('periode_operasional')
                         ->select('kode_periode')->where('status_periode','1')
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        $getLastNo = DB::table('tr_header_pemakaian_sp_bbm')
-                        ->select('no_bpm')
+        $getLastNo = DB::table('tr_header_pg_sp_bbm')
+                        ->select('no_sppb')
                         ->where('kode_periode','=',$jsonx[0]['kode_periode'])
-                        ->where('kd_area','=',$kd_area)
-                        ->orderBy('no_bpm','desc')
+                        ->where('from_kd_area','=',$from_kd_area)
+                        ->orderBy('no_sppb','desc')
                         ->get();        
 
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode']."/";
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_bpm'],  14, 4);
+            $nourut = substr($jsonz[0]['no_sppb'],  14, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -91,26 +91,26 @@ class PemakaianSpBbmController extends Controller
         }        
     }
 
-    public function trHeaderPemakaianSpBbm()
+    public function trHeaderPinGudSpBbm()
     {
-        $headerPemakaianSpBbm =  TrHeaderPemakaianSpBbm::all();
+        $headerPemakaianSpBbm =  TrHeaderPinGudSpBbm::all();
         $lokasi = Lokasi::all();
 
-        $data['title'] = 'Header Pemakaian Sparepart & BBM';
-        return view('transaction/pengeluaran_spbbm/trHeaderPemakaianSpBbm', $data, compact('headerPemakaianSpBbm','lokasi'));
+        $data['title'] = 'Header Pindah Gudang Sparepart & BBM';
+        return view('transaction/pengeluaran_spbbm/trHeaderPinGudSpBbm', $data, compact('headerPemakaianSpBbm','lokasi'));
     }
 
-    public function trHeaderPemakaianSpBbm_data(Request $request)
+    public function trHeaderPinGudSpBbm_data(Request $request)
     {
-        // $data = TrHeaderPemakaianSpBbm::query();
-        // $data =  TrHeaderPemakaianSpBbm::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
+        // $data = TrHeaderPinGudSpBbm::query();
+        // $data =  TrHeaderPinGudSpBbm::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
         //                             ->get(['tr_header_saldo_awal.*','ms.nama_supp as ns']);
         $getNPO = DB::table('periode_operasional')
                         ->select('*')->where('status_periode','1')
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        $data = DB::table(DB::raw("(SELECT tr_header_pemakaian_sp_bbm.*,mstr_lokasi.nama_lokasi as nmlok FROM tr_header_pemakaian_sp_bbm LEFT JOIN mstr_lokasi ON tr_header_pemakaian_sp_bbm.loc_activity = mstr_lokasi.kode_lokasi WHERE tr_header_pemakaian_sp_bbm.kode_periode = ".$jsonx[0]['kode_periode'].") as tis"));                                    
+        $data = DB::table(DB::raw("(SELECT * FROM tr_header_pg_sp_bbm WHERE kode_periode = ".$jsonx[0]['kode_periode'].") as tis"));                                    
 
         return Datatables::of($data)
                 ->setTotalRecords(100)
@@ -119,7 +119,7 @@ class PemakaianSpBbmController extends Controller
                     
                     $btn = '<a href="'. url('trDetailPemSpBbm').'/'.$data->id.'" class="edit btn btn-primary btn-sm">Detail</a>';
                     if(Auth::user()->level == "administrator"){
-                    $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-kode="'.$data->no_bpm.'" class="btn btn-danger btn-sm delStInvent" title="Delete">Delete</a>';
+                    $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-kode="'.$data->no_sppb.'" class="btn btn-danger btn-sm delStInvent" title="Delete">Delete</a>';
                     }
                     return $btn;
                 })
@@ -128,31 +128,32 @@ class PemakaianSpBbmController extends Controller
                 ->make(true);
     }
 
-    public function trHeaderPemakaianSpBbm_add(Request $request)
+    public function trHeaderPinGudSpBbm_add(Request $request)
     {
         // dd($request->kode_periode);
         // exit();
         $request->validate([
-            'no_ref' => 'required|unique:tr_header_pemakaian_sp_bbm',
-            'no_bpm' => 'required',
+            'no_ref' => 'required|unique:tr_header_pg_sp_bbm',
+            'no_sppb' => 'required',
         ]);
 
-        $trHeaderPemakaianSpBbm = new TrHeaderPemakaianSpBbm([
+        $trHeaderPinGudSpBbm = new TrHeaderPinGudSpBbm([
             'no_ref' => $request->no_ref,
-            'no_bpm' => $request->no_bpm,
-            'kd_area' => $request->kd_area,
+            'no_sppb' => $request->no_sppb,
+            'from_kd_area' => $request->from_kd_area,
+            'to_kd_area' => $request->to_kd_area,
             'kode_periode' => $request->kode_periode,
-            'tgl_p_sp_bbm' => $request->tgl_p_sp_bbm,
-            'loc_activity' => $request->loc_activity,
+            'tgl_pg_sp_bbm' => $request->tgl_pg_sp_bbm,
+            'keterangan' => $request->keterangan,
             'user_created' => Auth::user()->name
         ]);
-        $trHeaderPemakaianSpBbm->save();
-        return redirect()->route('trHeaderPemakaianSpBbm')->with('success', 'Tambah data sukses!');
+        $trHeaderPinGudSpBbm->save();
+        return redirect()->route('trHeaderPinGudSpBbm')->with('success', 'Tambah data sukses!');
     }
 
     public function trDetailPemSpBbm($id_head_p_spbbm)
     {
-        $getHeaderPsb = TrHeaderPemakaianSpBbm::find($id_head_p_spbbm); 
+        $getHeaderPsb = TrHeaderPinGudSpBbm::find($id_head_p_spbbm); 
         $fixedAsset = FixedAsset::all();
         $stsPemakaian = StsPemakaian::all();
         $stInvent = StInvent::all();
