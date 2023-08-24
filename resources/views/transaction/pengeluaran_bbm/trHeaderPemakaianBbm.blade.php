@@ -34,10 +34,15 @@
                   <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139{{ App\Http\Controllers\PemakaianBbmController::getNewNoRef('0139'); }}" autofocus>
               </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
               <div class="form-group">
                 <label>No BPM</label>
-                  <input type="text" class="form-control" id="no_bpm" name="no_bpm" placeholder="" value="">
+                  <select class="form-control select2" name="no_bpm" id="no_bpm" style="width: 100%;">
+                    <option value="" selected="selected">-- Fixed Asset --</option>
+                    @foreach ($fixAsset as $fas)
+                      <option value="{{ $fas->kode_fa }}">{{ $fas->nama_fa}}</option>
+                    @endforeach
+                  </select>
               </div>
             </div>
           </div>
@@ -62,7 +67,8 @@
                     @endforeach
                   </select>
               </div>
-            </div>        
+            </div>
+            <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\PemakaianBbmController::getKodePeriodeOperasional(); }}">        
           </div>
         <!-- /.card-body -->
         </div>
@@ -81,8 +87,9 @@
           <thead>
           <tr>
             <th>No Ref</th>
-            <th>No BPM</th>  
-            <th>Area</th>          
+            <th>No BPM</th>
+            <th>Nama BPM</th>
+            <th>Area</th>
             <th>Action</th>
           </tr>
           </thead>
@@ -102,11 +109,11 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('trHeaderTpnLmDestroy.del') }}" method="post">
+                <form action="{{ route('trHeaderPemakaianBbmDestroy.del') }}" method="post">
                   {{ csrf_field() }}
                   <div class="modal-body">
                       Apakah Anda yakin akan menghapus
-                      <span id="id-destroy2"></span> ?
+                      <span id="dakod"></span> ?
                       <input type='hidden' name='del_id' id='id-destroy'>
                   </div>
                   <div class="modal-footer">
@@ -138,8 +145,12 @@ $('#trHeaderPemakaianBbm').DataTable({
         name: 'no_bpm'
     },
     {
-        data: 'kd_area',
-        name: 'kd_area'
+        data: 'nmfa',
+        name: 'nmfa'
+    },
+    {
+        data: 'nmarea',
+        name: 'nmarea'
     },
     {
         data: 'action',
@@ -161,7 +172,7 @@ $(document).on('click', '.editStInvent', function() {
     });
 });
 
-$(document).on('click', '.delStInvent', function() {
+$(document).on('click', '.delPemBbm', function() {
     let id = $(this).attr('data-id');
     let dakod = $(this).attr('data-kode');
     $('#id-destroy').val(id);

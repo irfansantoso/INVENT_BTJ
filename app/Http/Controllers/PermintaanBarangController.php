@@ -129,11 +129,11 @@ class PermintaanBarangController extends Controller
 
     public function trDetailPb($id_header_pb)
     {
-        $getHeaderPb = TrHeaderPb::find($id_header_pb);     
+        $getHeaderPb = TrHeaderPb::find($id_header_pb);
         $stInvent = StInvent::all();
         // $stInvent = StInvent::where('id_head_pb','=',$request->del_id)->get();
         $getDetailPb = TrDetailPb::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_pb.kd_brg')                                    
-                                    ->where('tr_detail_pb.id','=',$id_header_pb)
+                                    ->where('tr_detail_pb.id_header_pb','=',$id_header_pb)
                                     ->get(['tr_detail_pb.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran']);
  
         $data['title'] = 'Detail Permintaan Barang';

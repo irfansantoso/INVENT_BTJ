@@ -19,31 +19,31 @@
     @endif
     <div class="card card-primary">
       <div class="card-header">
-        <h3 class="card-title">Pemakaian</h3>
+        <h3 class="card-title">Header Retur Pembelian - 24</h3>
       </div>
       <!-- /.card-header -->
       <!-- form start -->
 
-      <form class="form-horizontal" action="{{ route('trHeaderPemakaianSpBbm.add') }}" method="POST">
+      <form class="form-horizontal" action="{{ route('trHeaderRetPemSpBbm.add') }}" method="POST">
          @csrf        
         <div class="card-body">
           <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-2">
               <div class="form-group">
                 <label>No Ref</label>
-                  <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139{{ App\Http\Controllers\PemakaianSpBbmController::getNewNoRef('0139'); }}" autofocus>
+                  <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139{{ App\Http\Controllers\RetPemSpBbmController::getNewNoRef('0139'); }}" autofocus>
               </div>
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>No BPM</label>
-                  <input type="text" class="form-control" id="no_bpm" name="no_bpm" placeholder="" value="K0139/{{ App\Http\Controllers\PemakaianSpBbmController::getNewNoBpm('0139'); }}">
+                <label>SPPB</label>
+                  <input type="text" class="form-control" id="no_sppb" name="no_sppb" placeholder="" value="N0139/{{ App\Http\Controllers\RetPemSpBbmController::getNewNoBpm('0139'); }}">
               </div>
             </div>
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Tanggal</label>
-                  <input type="text" class="form-control" name="tgl_p_sp_bbm" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
+                  <input type="text" class="form-control" name="tgl_rp_sp_bbm" value="{{ old('tgl_rp_sp_bbm') }}" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
               </div>
             </div>
           </div>
@@ -52,24 +52,34 @@
               <div class="form-group">
                 <label>Area</label>                
                   <select class="form-control" name="kd_area" id="kd_area" style="width: 100%;">
-                    <option value="0139">CAMP BTJ</option>
-                    <option value="0100">PUSAT BTJ</option>
-                    <option value="0124">CABANG BTJ</option>                     
+                    <option value="0139">0139-CAMP BTJ</option>
+                    <option value="0100">0100-PUSAT BTJ</option>
+                    <option value="0124">0124-CABANG BTJ</option>
+                    <option value="0539">0539-CAMP BTS</option>                     
                   </select>
               </div>
             </div>            
             <div class="col-sm-3">
               <div class="form-group">
-                <label>Lokasi</label>
-                  <select class="form-control select2" name="loc_activity" id="loc_activity" style="width: 100%;">
-                    <option value="" selected="selected">-- Lokasi --</option>
-                    @foreach ($lokasi as $lk)
-                      <option value="{{ $lk->kode_lokasi }}">{{ $lk->nama_lokasi }}</option>
+                <label>Supplier</label>
+                  <select class="form-control select2" name="supplier" id="supplier" style="width: 100%;">
+                    <option value="" selected="selected">-- Supplier --</option>
+                    <?php
+                      $valsp = old('supplier');
+                    ?>
+                    @foreach ($supplier as $sp)
+                      <option value="{{ $sp->kode_supp }}" {{ $valsp == $sp->kode_supp ? 'selected' : '' }}>{{ $sp->nama_supp }}</option>
                     @endforeach
                   </select>
               </div>
             </div>
-           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\PemakaianSpBbmController::getKodePeriodeOperasional(); }}">             
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Keterangan</label>
+                  <input type="text" class="form-control" id="keterangan" name="keterangan" value="{{ old('keterangan') }}">
+              </div>
+            </div>
+           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\RetPemSpBbmController::getKodePeriodeOperasional(); }}">             
           </div>
         <!-- /.card-body -->
         </div>
@@ -84,13 +94,14 @@
     <div class="card">
       <!-- /.card-header -->
       <div class="card-body">
-        <table id="trHeaderPemakaianSpBbm" class="table table-bordered table-striped">
+        <table id="trHeaderRetPemSpBbm" class="table table-bordered table-striped">
           <thead>
           <tr>
             <th>No Ref</th>
-            <th>No BPM</th>  
-            <th>Area</th>          
-            <th>Lokasi</th>            
+            <th>No SPPB</th>  
+            <th>Area</th>
+            <th>Supplier</th>          
+            <th>Keterangan</th>            
             <th>Tanggal</th>
             <th>Action</th>
           </tr>
@@ -111,11 +122,11 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('trHeaderPemakaianSpBbmDestroy.del') }}" method="post">
+                <form action="{{ route('trHeaderRetPemSpBbmDestroy.del') }}" method="post">
                   {{ csrf_field() }}
                   <div class="modal-body">
                       Apakah Anda yakin akan menghapus nomor 
-                      <span id="kode"></span> ?
+                      <span id="sppb"></span> ?
                       <input type='hidden' name='del_id' id='id-destroy'>
                   </div>
                   <div class="modal-footer">
@@ -131,11 +142,11 @@
 <script type="text/javascript">
 //$('.select2-basic').select2();
 
-$('#trHeaderPemakaianSpBbm').DataTable({
+$('#trHeaderRetPemSpBbm').DataTable({
   responsive: true,
   processing: true,
   serverSide: true,
-  ajax: '{!! route('trHeaderPemakaianSpBbm.data') !!}', // memanggil route yang menampilkan data json
+  ajax: '{!! route('trHeaderRetPemSpBbm.data') !!}', // memanggil route yang menampilkan data json
   columns: 
   [
     { // mengambil & menampilkan kolom sesuai tabel database
@@ -143,20 +154,24 @@ $('#trHeaderPemakaianSpBbm').DataTable({
         name: 'no_ref'
     },
     {
-        data: 'no_bpm',
-        name: 'no_bpm'
+        data: 'no_sppb',
+        name: 'no_sppb'
     },
     {
-        data: 'nmlok',
-        name: 'nmlok'
+        data: 'nama',
+        name: 'nama'
     },
     {
-        data: 'kd_area',
-        name: 'kd_area'
+        data: 'nmsupp',
+        name: 'nmsupp'
     },
     {
-        data: 'tgl_p_sp_bbm',
-        name: 'tgl_p_sp_bbm'
+        data: 'keterangan',
+        name: 'keterangan'
+    },
+    {
+        data: 'tgl_rp_sp_bbm',
+        name: 'tgl_rp_sp_bbm'
     }, 
     {
         data: 'action',
@@ -178,12 +193,12 @@ $(document).on('click', '.editStInvent', function() {
     });
 });
 
-$(document).on('click', '.delDetPemSpBbm', function() {
+$(document).on('click', '.delDetRetPemSpBbm', function() {
     let id = $(this).attr('data-id');
-    let kode = $(this).attr('data-kode');
+    let sppb = $(this).attr('data-sppb');
     $('#id-destroy').val(id);
     $('#id-destroy2').html(id);
-    $('#kode').html(kode);
+    $('#sppb').html(sppb);
 });
 </script> 
 @stop

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\TrHeaderPemakaianSpBbm;
-use App\Models\TrDetailPemSpBbm;
+use App\Models\TrHeaderKoreksiSpBbm;
+use App\Models\TrDetailKoreksiSpBbm;
 use App\Models\StInvent;
 use App\Models\StsPemakaian;
 use App\Models\Lokasi;
+use App\Models\Supplier;
 use App\Models\FixedAsset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Session;
 
-class PemakaianSpBbmController extends Controller
+class KoreksiSpBbmController extends Controller
 {
     public static function getKodePeriodeOperasional()
     {
@@ -44,7 +45,7 @@ class PemakaianSpBbmController extends Controller
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        $getLastNo = DB::table('tr_header_pemakaian_sp_bbm')
+        $getLastNo = DB::table('tr_header_k_sp_bbm')
                         ->select('no_ref')
                         ->where('kode_periode','=',$jsonx[0]['kode_periode'])
                         ->where('kd_area','=',$kd_area)
@@ -71,17 +72,17 @@ class PemakaianSpBbmController extends Controller
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        $getLastNo = DB::table('tr_header_pemakaian_sp_bbm')
-                        ->select('no_bpm')
+        $getLastNo = DB::table('tr_header_k_sp_bbm')
+                        ->select('no_koreksi')
                         ->where('kode_periode','=',$jsonx[0]['kode_periode'])
                         ->where('kd_area','=',$kd_area)
-                        ->orderBy('no_bpm','desc')
+                        ->orderBy('no_koreksi','desc')
                         ->get();        
 
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode']."/";
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_bpm'],  14, 4);
+            $nourut = substr($jsonz[0]['no_koreksi'],  14, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -91,35 +92,35 @@ class PemakaianSpBbmController extends Controller
         }        
     }
 
-    public function trHeaderPemakaianSpBbm()
+    public function trHeaderKoreksiSpBbm()
     {
-        $headerPemakaianSpBbm =  TrHeaderPemakaianSpBbm::all();
-        $lokasi = Lokasi::all();
+        $headerKoreksiSpBbm =  TrHeaderKoreksiSpBbm::all();
+        $supplier = Supplier::all();
 
-        $data['title'] = 'Header Pemakaian Sparepart & BBM';
-        return view('transaction/pengeluaran_spbbm/trHeaderPemakaianSpBbm', $data, compact('headerPemakaianSpBbm','lokasi'));
+        $data['title'] = 'Header Koreksi Sparepart & BBM';
+        return view('transaction/pengeluaran_spbbm/trHeaderKoreksiSpBbm', $data, compact('headerKoreksiSpBbm','supplier'));
     }
 
-    public function trHeaderPemakaianSpBbm_data(Request $request)
+    public function trHeaderKoreksiSpBbm_data(Request $request)
     {
-        // $data = TrHeaderPemakaianSpBbm::query();
-        // $data =  TrHeaderPemakaianSpBbm::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
+        // $data = TrHeaderKoreksiSpBbm::query();
+        // $data =  TrHeaderKoreksiSpBbm::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
         //                             ->get(['tr_header_saldo_awal.*','ms.nama_supp as ns']);
         $getNPO = DB::table('periode_operasional')
                         ->select('*')->where('status_periode','1')
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        $data = DB::table(DB::raw("(SELECT tr_header_pemakaian_sp_bbm.*,mstr_lokasi.nama_lokasi as nmlok FROM tr_header_pemakaian_sp_bbm LEFT JOIN mstr_lokasi ON tr_header_pemakaian_sp_bbm.loc_activity = mstr_lokasi.kode_lokasi WHERE tr_header_pemakaian_sp_bbm.kode_periode = ".$jsonx[0]['kode_periode'].") as tis"));                                    
+        $data = DB::table(DB::raw("(SELECT tr_header_k_sp_bbm.*, mka.nama_area as nama, ms.nama_supp as nmsupp FROM tr_header_k_sp_bbm LEFT JOIN mstr_kd_area as mka ON tr_header_k_sp_bbm.kd_area = mka.kode_area LEFT JOIN mstr_supplier as ms ON tr_header_k_sp_bbm.supplier = ms.kode_supp WHERE tr_header_k_sp_bbm.kode_periode = ".$jsonx[0]['kode_periode'].") as tis"));                                    
 
         return Datatables::of($data)
                 ->setTotalRecords(100)
                 ->addIndexColumn()
                 ->addColumn('action', function($data){
                     
-                    $btn = '<a href="'. url('trDetailPemSpBbm').'/'.$data->id.'" class="edit btn btn-primary btn-sm">Detail</a>';
+                    $btn = '<a href="'. url('trDetailKoreksiSpBbm').'/'.$data->id.'" class="edit btn btn-primary btn-sm">Detail</a>';
                     if(Auth::user()->level == "administrator"){
-                    $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-kode="'.$data->no_bpm.'" class="btn btn-danger btn-sm delDetPemSpBbm" title="Delete">Delete</a>';
+                    $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-koreksi="'.$data->no_koreksi.'" class="btn btn-danger btn-sm delDetKoreksiSpBbm" title="Delete">Delete</a>';
                     }
                     return $btn;
                 })
@@ -128,74 +129,92 @@ class PemakaianSpBbmController extends Controller
                 ->make(true);
     }
 
-    public function trHeaderPemakaianSpBbm_add(Request $request)
+    public function trHeaderKoreksiSpBbm_add(Request $request)
     {
         // dd($request->kode_periode);
         // exit();
+
+        $getNPO = DB::table('periode_operasional')
+                        ->select('*')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
+
+        if($request->tgl_k_sp_bbm < $jsonx[0]['awal_tgl'] || $request->tgl_k_sp_bbm > $jsonx[0]['akhir_tgl'])
+        {
+           // return redirect()->route('tr_header_k_sp_bbm')->with('error', 'Tanggal tidak sesuai dengan tahun periode!'); 
+            return back()
+                    ->withInput()
+                    ->with('error','Tanggal tidak sesuai dengan tahun periode!');
+        }
+
         $request->validate([
-            'no_ref' => 'required|unique:tr_header_pemakaian_sp_bbm',
-            'no_bpm' => 'required',
+            'no_ref' => 'required|unique:tr_header_k_sp_bbm',
+            'no_koreksi' => 'required',
         ]);
 
-        $trHeaderPemakaianSpBbm = new TrHeaderPemakaianSpBbm([
+        $trHeaderKoreksiSpBbm = new TrHeaderKoreksiSpBbm([
             'no_ref' => $request->no_ref,
-            'no_bpm' => $request->no_bpm,
+            'no_koreksi' => $request->no_koreksi,
             'kd_area' => $request->kd_area,
+            'supplier' => $request->supplier,
             'kode_periode' => $request->kode_periode,
-            'tgl_p_sp_bbm' => $request->tgl_p_sp_bbm,
-            'loc_activity' => $request->loc_activity,
+            'tgl_k_sp_bbm' => $request->tgl_k_sp_bbm,
+            'keterangan' => $request->keterangan,
             'user_created' => Auth::user()->name
         ]);
-        $trHeaderPemakaianSpBbm->save();
-        return redirect()->route('trHeaderPemakaianSpBbm')->with('success', 'Tambah data sukses!');
+        $trHeaderKoreksiSpBbm->save();
+        return redirect()->route('trHeaderKoreksiSpBbm')->with('success', 'Tambah data sukses!');
     }
 
-    public function trHeaderPemakaianSpBbmDestroy_del(Request $request)
+    public function trHeaderKoreksiSpBbmDestroy_del(Request $request)
     {
 
-        $getDetPemSpBbm = TrDetailPemSpBbm::where('id_head_p_spbbm','=',$request->del_id)->get();
-        if (!$getDetPemSpBbm->isEmpty()) 
+        $getDetKoreksiSpBbm = TrDetailKoreksiSpBbm::where('id_head_k_spbbm','=',$request->del_id)->get();
+        if (!$getDetKoreksiSpBbm->isEmpty()) 
         { 
             return back()->with('error',' Failed, Hapus data detailnya terlebih dahulu!');
         }else{
-            TrHeaderPemakaianSpBbm::find($request->del_id)->delete();
+            TrHeaderKoreksiSpBbm::find($request->del_id)->delete();
             return back()->with('success',' Data deleted successfully');            
         }
     }
 
-    public function trDetailPemSpBbm($id_head_p_spbbm)
+    public function trDetailKoreksiSpBbm($id_head_k_spbbm)
     {
-        $getHeaderPsb = TrHeaderPemakaianSpBbm::find($id_head_p_spbbm); 
+        // $getHeaderKoreksisb = TrHeaderKoreksiSpBbm::find($id_head_k_spbbm);
+        $getHeaderKoreksisb = TrHeaderKoreksiSpBbm::leftJoin('mstr_kd_area as mkd', 'mkd.kode_area','=','tr_header_k_sp_bbm.kd_area')                            
+                                    ->where('tr_header_k_sp_bbm.id','=',$id_head_k_spbbm)
+                                    ->first(['tr_header_k_sp_bbm.*','mkd.nama_area as nmarea']); 
         $fixedAsset = FixedAsset::all();
         $stsPemakaian = StsPemakaian::all();
         $stInvent = StInvent::all();
-        $getDetailPsb = TrDetailPemSpBbm::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_pem_sp_bbm.kd_brg')
+        $getDetailKoreksiSb = TrDetailKoreksiSpBbm::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_k_sp_bbm.kd_brg')
                                     ->leftJoin('mstr_jnsalat_merk as mjam', 'mjam.kode_jnsAlatMerk','=','tris.kel_brg')
-                                    ->leftJoin('mstr_fixed_asset as mfa', 'mfa.kode_fa','=','tr_detail_pem_sp_bbm.kd_fa')
-                                    ->leftJoin('mstr_sts_pemakaian as msp', 'msp.kode','=','tr_detail_pem_sp_bbm.kd_sts')
-                                    ->where('tr_detail_pem_sp_bbm.id_head_p_spbbm','=',$id_head_p_spbbm)
-                                    ->get(['tr_detail_pem_sp_bbm.*','tris.kd_brg as kdbrg','tris.part_numb as partnumb','tris.merk as merk','tris.ukuran as ukuran','mjam.keterangan as ketjnsalat','mfa.nama_fa as nmfa','msp.keterangan as stspakai']);
+                                    ->leftJoin('mstr_fixed_asset as mfa', 'mfa.kode_fa','=','tr_detail_k_sp_bbm.kd_fa')
+                                    ->leftJoin('mstr_sts_pemakaian as msp', 'msp.kode','=','tr_detail_k_sp_bbm.kd_sts')
+                                    ->where('tr_detail_k_sp_bbm.id','=',$id_head_k_spbbm)
+                                    ->get(['tr_detail_k_sp_bbm.*','tris.kd_brg as kdbrg','tris.part_numb as partnumb','tris.merk as merk','tris.ukuran as ukuran','mjam.keterangan as ketjnsalat','mfa.nama_fa as nmfa','msp.keterangan as stspakai']);
  
-        $data['title'] = 'Detail Pemakaian Sparepart & BBM';
-        return view('transaction/pengeluaran_spbbm/trDetailPemSpBbm', $data, compact('getHeaderPsb','fixedAsset','stsPemakaian','stInvent','getDetailPsb'));
+        $data['title'] = 'Detail Koreksi Sparepart & BBM';
+        return view('transaction/pengeluaran_spbbm/trDetailKoreksiSpBbm', $data, compact('getHeaderKoreksisb','fixedAsset','stsPemakaian','stInvent','getDetailKoreksiSb'));
         
     }
 
-    public function trDetailPemSpBbm_add(Request $request)
+    public function trDetailKoreksiSpBbm_add(Request $request)
     {
 
         $request->validate([
             'kd_brg' => 'required',
         ]);
 
-        $year = date('Y', strtotime($request->tgl_det_p_spbbm));
-        $month = date("m", strtotime($request->tgl_det_p_spbbm));
+        $year = date('Y', strtotime($request->tgl_det_k_spbbm));
+        $month = date("m", strtotime($request->tgl_det_k_spbbm));
 
-        $trDetailPemSpBbm = new trDetailPemSpBbm([
-            'id_head_p_spbbm' => $request->id_head_p_spbbm,
+        $trDetailKoreksiSpBbm = new trDetailKoreksiSpBbm([
+            'id_head_k_spbbm' => $request->id_head_k_spbbm,
             'kd_brg' => $request->kd_brg,
             'gudang' => $request->kd_area,
-            'tgl_det_p_spbbm' => $request->tgl_det_p_spbbm,
+            'tgl_det_k_spbbm' => $request->tgl_det_k_spbbm,
             'year' => $year,
             'month' => $month,
             'kd_fa' => $request->kode_fa,
@@ -217,15 +236,15 @@ class PemakaianSpBbmController extends Controller
             $request->session()->regenerateToken();
             return redirect('/');
         }else{
-            $trDetailPemSpBbm->save();
-            return redirect()->route('trDetailPemSpBbm',[$request->id_head_p_spbbm])->with('success', 'Tambah data sukses!');
+            $trDetailKoreksiSpBbm->save();
+            return redirect()->route('trDetailKoreksiSpBbm',[$request->id_head_k_spbbm])->with('success', 'Tambah data sukses!');
         }
     }
 
-    public function trDetailPemSpBbm_edit(Request $request)
+    public function trDetailKoreksiSpBbm_edit(Request $request)
     {
 
-        TrDetailPemSpBbm::where('id', $request->id)
+        trDetailKoreksiSpBbm::where('id', $request->id)
                   ->update([
                             'kd_brg' => $request->kd_brg,
                             'kd_fa' => $request->kode_fa,
@@ -238,25 +257,25 @@ class PemakaianSpBbmController extends Controller
                             'user_created' => Auth::user()->name,
                             'updated_at' => date('Y-m-d H:i:s'),
                             ]);
-        // return redirect()->route('trDetailPemSpBbm',[$request->id_head_p_spbbm])->with('success', 'Ubah data sukses!');
+        // return redirect()->route('trDetailKoreksiSpBbm',[$request->id_head_k_spbbm])->with('success', 'Ubah data sukses!');
                   return back()->with('success',' Ubah data successfully');
 
     }
 
-    public function trDetailPemSpBbm_del(Request $request)
+    public function trDetailKoreksiSpBbm_del(Request $request)
     {
-        $getDetSa =  TrDetailPemSpBbm::where('id','=',$request->del_id)->get();
-        if ($getDetSa->isEmpty()) 
+        $getDetKoreksiSpBbm =  TrDetailKoreksiSpBbm::where('id','=',$request->del_id)->get();
+        if ($getDetKoreksiSpBbm->isEmpty()) 
         { 
             return back()->with('error',' Failed, data tidak ada!');
         }else{
-            TrDetailPemSpBbm::find($request->del_id)->delete();
+            TrDetailKoreksiSpBbm::find($request->del_id)->delete();
             return back()->with('success',' Data deleted successfully');
         }
 
     }
 
-    public function stInvSpBbm_data(Request $request)
+    public function stInvKoreksiSpBbm_data(Request $request)
     {
         // $data = StInvent::query();
       $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_sat FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
@@ -290,7 +309,7 @@ class PemakaianSpBbmController extends Controller
                 ->make(true);
     }
 
-    public function stInvSpBbm_data_x(Request $request)
+    public function stInvKoreksiSpBbm_data_x(Request $request)
     {
         // $data = StInvent::query();
       $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_sat FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
@@ -323,30 +342,5 @@ class PemakaianSpBbmController extends Controller
                 // ->toJson();
                 ->make(true);
     }
-
-    // public function stInvent_edit(Request $request)
-    // {
-    //     StInvent::where('id', $request->idM)
-    //               ->update(['part_numb' => $request->part_numb,
-    //                         'ukuran' => $request->ukuran,
-    //                         'uom' => $request->uom,
-    //                         'merk' => $request->merk,
-    //                         'status' => $request->status
-    //                         ]);
-    //     return redirect()->route('stInvent')->with('success', 'Edit data sukses!');
-    // }
-
-    // public function stInvent_del(Request $request)
-    // {
-    //     DB::beginTransaction();
-    //     try{
-    //         StInvent::where('id', $request->del_id)->delete();
-    //         DB::commit();
-    //         return back()->with('success',' Data deleted successfully');
-    //     }catch(\Exception $e){
-    //         DB::rollback();
-    //         return back()->with('error',' There is some problem, please try again or call your admin!');
-    //     }
-    // }
 
 }

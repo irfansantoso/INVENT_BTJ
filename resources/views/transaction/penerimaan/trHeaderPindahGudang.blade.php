@@ -47,18 +47,31 @@
                   <input type="text" class="form-control" name="tgl_sa" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
               </div>
             </div>
-          </div>
-          <div class="row">
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Kode Area</label>                
                   <select class="form-control" name="kd_area" id="kd_area" style="width: 100%;">
                     <option value="0139">CAMP BTJ</option>
                     <option value="0100">PUSAT BTJ</option>
-                    <option value="0124">CABANG BTJ</option>                     
+                    <option value="0124">CABANG BTJ</option>
+                    <option value="0539">CABANG BTS</option>                     
                   </select>
               </div>
-            </div>            
+            </div>
+          </div>
+          <div class="row">            
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Dari Area</label>                
+                  <select class="form-control" name="from_kd_area" id="from_kd_area" style="width: 100%;">
+                    <option value="0">-- Pilih Area --</option>
+                    <option value="0139">CAMP BTJ</option>
+                    <option value="0100">PUSAT BTJ</option>
+                    <option value="0124">CABANG BTJ</option>
+                    <option value="0539">CABANG BTS</option>
+                  </select>
+              </div>
+            </div>           
             <div class="col-sm-3">
               <div class="form-group">
                 <label>Supplier</label>
@@ -70,7 +83,13 @@
                   </select>
               </div>
             </div>
-           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\UserController::getKodePeriodeOperasional(); }}">             
+            <div class="col-sm-5">
+              <div class="form-group">
+                <label>Keterangan</label>
+                  <input type="text" class="form-control" name="keterangan" id="Keterangan">
+              </div>
+            </div>
+           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\PindahGudangController::getKodePeriodeOperasional(); }}">             
           </div>
         <!-- /.card-body -->
         </div>

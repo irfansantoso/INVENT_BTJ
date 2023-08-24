@@ -27,7 +27,8 @@ class TrDetailPindahGudang extends Model
         'uom',
         'harga_satuan',
         'total',
-        'tgl_det_sa',        
+        'tgl_det_sa',
+        'keterangan',  
         'user_created'
     ];
 }

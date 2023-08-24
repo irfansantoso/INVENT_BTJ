@@ -1,3 +1,4 @@
+
 @extends('template')
 @section('content')
 <!-- Content Header (Page header) -->
@@ -19,57 +20,53 @@
     @endif
     <div class="card card-primary">
       <div class="card-header">
-        <h3 class="card-title">Pemakaian</h3>
+        <h3 class="card-title">Header Retur Pemakaian - 14</h3>
       </div>
       <!-- /.card-header -->
       <!-- form start -->
 
-      <form class="form-horizontal" action="{{ route('trHeaderPemakaianSpBbm.add') }}" method="POST">
+      <form class="form-horizontal" action="{{ route('trHeaderReturPemakaian.add') }}" method="POST">
          @csrf        
-        <div class="card-body">
+        <div class="card-body">          
           <div class="row">
             <div class="col-sm-3">
               <div class="form-group">
                 <label>No Ref</label>
-                  <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139{{ App\Http\Controllers\PemakaianSpBbmController::getNewNoRef('0139'); }}" autofocus>
+                  <input type="text" class="form-control" id="no_ref" name="no_ref" placeholder="" value="0139/{{ App\Http\Controllers\ReturPemakaianController::getNewNoRef('0139'); }}" autofocus>
               </div>
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>No BPM</label>
-                  <input type="text" class="form-control" id="no_bpm" name="no_bpm" placeholder="" value="K0139/{{ App\Http\Controllers\PemakaianSpBbmController::getNewNoBpm('0139'); }}">
+                <label>No Retur</label>
+                  <input type="text" class="form-control" id="retur_p" name="retur_p" placeholder="" value="C0139/{{ App\Http\Controllers\ReturPemakaianController::getNewNoSppb('0139'); }}">
               </div>
             </div>
             <div class="col-sm-2">
               <div class="form-group">
-                <label>Tanggal</label>
-                  <input type="text" class="form-control" name="tgl_p_sp_bbm" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
+                <label>Tanggal Terima</label>
+                  <input type="text" class="form-control" name="tgl_retur" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask value="{{ old('tgl_retur') }}">                
               </div>
-            </div>
+            </div>            
           </div>
-          <div class="row">
+          <div class="row">            
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Area</label>                
                   <select class="form-control" name="kd_area" id="kd_area" style="width: 100%;">
                     <option value="0139">CAMP BTJ</option>
                     <option value="0100">PUSAT BTJ</option>
-                    <option value="0124">CABANG BTJ</option>                     
+                    <option value="0124">CABANG BTJ</option>
+                    <option value="0539">CABANG BTS</option>
                   </select>
               </div>
             </div>            
-            <div class="col-sm-3">
+            <div class="col-sm-5">
               <div class="form-group">
-                <label>Lokasi</label>
-                  <select class="form-control select2" name="loc_activity" id="loc_activity" style="width: 100%;">
-                    <option value="" selected="selected">-- Lokasi --</option>
-                    @foreach ($lokasi as $lk)
-                      <option value="{{ $lk->kode_lokasi }}">{{ $lk->nama_lokasi }}</option>
-                    @endforeach
-                  </select>
+                <label>Keterangan</label>
+                  <input type="text" class="form-control" name="keterangan" id="Keterangan" value="{{ old('keterangan') }}">
               </div>
             </div>
-           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\PemakaianSpBbmController::getKodePeriodeOperasional(); }}">             
+           <input type="hidden" class="form-control" id="kode_periode" name="kode_periode" value="{{ App\Http\Controllers\ReturPemakaianController::getKodePeriodeOperasional(); }}">             
           </div>
         <!-- /.card-body -->
         </div>
@@ -84,14 +81,14 @@
     <div class="card">
       <!-- /.card-header -->
       <div class="card-body">
-        <table id="trHeaderPemakaianSpBbm" class="table table-bordered table-striped">
+        <table id="trHeaderReturPemakaian" class="table table-bordered table-striped">
           <thead>
           <tr>
             <th>No Ref</th>
-            <th>No BPM</th>  
-            <th>Area</th>          
-            <th>Lokasi</th>            
-            <th>Tanggal</th>
+            <th>No Retur</th>  
+            <th>Area</th>            
+            <th>Tanggal Terima</th>
+            <th>Keterangan</th>
             <th>Action</th>
           </tr>
           </thead>
@@ -111,11 +108,11 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('trHeaderPemakaianSpBbmDestroy.del') }}" method="post">
+                <form action="{{ route('trHeaderReturPemakaianDestroy.del') }}" method="post">
                   {{ csrf_field() }}
                   <div class="modal-body">
-                      Apakah Anda yakin akan menghapus nomor 
-                      <span id="kode"></span> ?
+                      Apakah Anda yakin akan menghapus
+                      <span id="dakod"></span> ?
                       <input type='hidden' name='del_id' id='id-destroy'>
                   </div>
                   <div class="modal-footer">
@@ -131,11 +128,17 @@
 <script type="text/javascript">
 //$('.select2-basic').select2();
 
-$('#trHeaderPemakaianSpBbm').DataTable({
+$('#kel_brg').on('change', function (e) { 
+    var kel_brg = $('#kel_brg').find(':selected').data('gjam');
+    // var kel_brg = document.getElementById('kel_brg');
+    $('#kd_brg').val(kel_brg);
+});
+
+$('#trHeaderReturPemakaian').DataTable({
   responsive: true,
   processing: true,
   serverSide: true,
-  ajax: '{!! route('trHeaderPemakaianSpBbm.data') !!}', // memanggil route yang menampilkan data json
+  ajax: '{!! route('trHeaderReturPemakaian.data') !!}', // memanggil route yang menampilkan data json
   columns: 
   [
     { // mengambil & menampilkan kolom sesuai tabel database
@@ -143,21 +146,21 @@ $('#trHeaderPemakaianSpBbm').DataTable({
         name: 'no_ref'
     },
     {
-        data: 'no_bpm',
-        name: 'no_bpm'
+        data: 'retur_p',
+        name: 'retur_p'
     },
     {
-        data: 'nmlok',
-        name: 'nmlok'
+        data: 'nmarea',
+        name: 'nmarea'
     },
     {
-        data: 'kd_area',
-        name: 'kd_area'
+        data: 'tgl_retur',
+        name: 'tgl_retur'
     },
     {
-        data: 'tgl_p_sp_bbm',
-        name: 'tgl_p_sp_bbm'
-    }, 
+        data: 'keterangan',
+        name: 'keterangan'
+    },
     {
         data: 'action',
         name: 'action',
@@ -167,23 +170,22 @@ $('#trHeaderPemakaianSpBbm').DataTable({
   ],
 });
 
-$(document).on('click', '.editStInvent', function() {
-    let id = $(this).attr('data-id');
+// $(document).on('click', '.editStInvent', function() {
+//     let id = $(this).attr('data-id');
 
-    $.ajax({
-        type: 'GET',
-        url: "{{ URL::to('stInvent/showedit')}}"+"/"+id
-    }).done( function( response ) {
-        $('#editForm').html(response.html);
-    });
-});
+//     $.ajax({
+//         type: 'GET',
+//         url: "{{ URL::to('trDetailReturPemakaian/showedit')}}"+"/"+id
+//     }).done( function( response ) {
+//         $('#editForm').html(response.html);
+//     });
+// });
 
-$(document).on('click', '.delDetPemSpBbm', function() {
+$(document).on('click', '.delHeadReturPemakaian', function() {
     let id = $(this).attr('data-id');
-    let kode = $(this).attr('data-kode');
+    let dakod = $(this).attr('data-kode');
     $('#id-destroy').val(id);
-    $('#id-destroy2').html(id);
-    $('#kode').html(kode);
+    $('#dakod').html(dakod);
 });
 </script> 
 @stop

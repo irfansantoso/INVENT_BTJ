@@ -35,7 +35,7 @@
 
         <div class="card-body">          
           <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-2">
               <div class="form-group">
                 <label>No Ref :</label><br/>
                   {{ $getHeaderSa->no_ref }}
@@ -52,13 +52,33 @@
                 <label>Tgl Saldo Awal :</label><br/>                
                   {{ $getHeaderSa->tgl_sa }}
               </div>
-            </div>            
+            </div>  
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Kode Area :</label><br/>                
+                  {{ $getHeaderSa->kd_area }} - {{ $getHeaderSa->nmarea }}
+              </div>
+            </div>         
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Dari Area :</label><br/>                
+                  {{ $getHeaderSa->from_kd_area }} - {{ $getHeaderSa->nmarea2 }}
+              </div>
+            </div>          
             <div class="col-sm-3">
               <div class="form-group">
                 <label>Supplier :</label><br/>
-                  {{ $getHeaderSa->supplier }}
+                  {{ $getHeaderSa->supplier }} - {{ $getHeaderSa->nmsupp }}
               </div>
-            </div>          
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Keterangan :</label><br/>
+                  {{ $getHeaderSa->keterangan }}
+              </div>
+            </div>
           </div>
           <hr>
           <div class="row">
@@ -106,7 +126,12 @@
                   <input type="number" class="form-control" id="total" name="total" readonly>
               </div>
             </div>
-            
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Keterangan</label>
+                  <input type="text" class="form-control" id="keterangan" name="keterangan">
+              </div>
+            </div>
           </div>
         <!-- /.card-body -->
         </div>
@@ -131,6 +156,7 @@
             <th>Jumlah</th>            
             <th>Satuan</th>
             <th>Total</th>
+            <th>Keterangan</th>
             <th>Action</th>
           </tr>
           </thead>
@@ -143,6 +169,7 @@
                 <td>{{ $gds->qty }}</td>
                 <td>{{ number_format($gds->harga_satuan,2,",",".") }}</td>
                 <td>{{ number_format($gds->total,2,",",".") }}</td>
+                <td>{{ $gds->keterangan }}</td>
                 <td>                
                   <a href="#" data-toggle="modal"
                   data-target="#modalEdit"
@@ -311,7 +338,6 @@ $(document).on('click', '.delDetSa', function() {
     let dakod = $(this).attr('data-kode');
     $('#id-destroy').val(id);
     $('#dakod').html(dakod);
-    alert(id);
 });
 
 /* Tanpa Rupiah */

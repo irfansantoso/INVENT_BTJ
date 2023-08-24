@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class TrHeaderPindahGudang extends Model
+class TrDetailPinGudSpBbm extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -17,17 +17,21 @@ class TrHeaderPindahGudang extends Model
      * @var array<int, string>
      */
     // public $timestamps = false;
-    protected $table = 'tr_header_saldo_awal';
+    protected $table = 'tr_detail_pg_sp_bbm';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'no_ref',
-        'no_sppb',
-        'supplier',
-        'kd_area',
-        'from_kd_area',
-        'kode_periode',
-        'tgl_sa',
-        'keterangan',
+        'id_head_p_spbbm',
+        'kd_brg',
+        'tgl_det_p_spbbm',
+        'part_numb',
+        'kd_fa',
+        'qty',
+        'total',
+        'hrg_beli',
+        'uom',
+        'kd_sts',
+        'kode_periode',        
+        'keterangan',        
         'user_created'
     ];
 }

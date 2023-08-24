@@ -3,10 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PermintaanBarangController;
 use App\Http\Controllers\PindahGudangController;
+use App\Http\Controllers\ReturPemakaianController;
+use App\Http\Controllers\KoreksiSoController;
 use App\Http\Controllers\StInventController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProcessQtyController;
 use App\Http\Controllers\PemakaianSpBbmController;
+use App\Http\Controllers\PinGudSpBbmController;
+use App\Http\Controllers\RetPemSpBbmController;
+use App\Http\Controllers\KoreksiSpBbmController;
 use App\Http\Controllers\PemakaianBbmController;
 use App\Http\Controllers\Master\JnsAlatController;
 use App\Http\Controllers\Master\LokasiController;
@@ -109,6 +114,32 @@ Route::get('trDetailPindahGudang/showedit/{id}', [PindahGudangController::class,
 Route::post('trDetailPindahGudang/edit', [PindahGudangController::class, 'trDetailPindahGudang_edit'])->name('trDetailPindahGudang.edit')->middleware('auth');
 Route::post('trDetailPindahGudang/delete/', [PindahGudangController::class, 'trDetailPindahGudang_del'])->name('trDetailPindahGudang.del')->middleware('auth');
 
+Route::get('trHeaderReturPemakaian',[ReturPemakaianController::class, 'trHeaderReturPemakaian'])->name('trHeaderReturPemakaian')->middleware('auth');
+Route::get('trHeaderReturPemakaian/json', [ReturPemakaianController::class, 'trHeaderReturPemakaian_data'])->name('trHeaderReturPemakaian.data')->middleware('auth');
+Route::post('trHeaderReturPemakaian', [ReturPemakaianController::class, 'trHeaderReturPemakaian_add'])->name('trHeaderReturPemakaian.add')->middleware('auth');
+Route::post('trHeaderReturPemakaian/delete/', [ReturPemakaianController::class, 'trHeaderReturPemakaianDestroy_del'])->name('trHeaderReturPemakaianDestroy.del')->middleware('auth');
+
+Route::get('trDetailReturPemakaian/{id}', [ReturPemakaianController::class, 'trDetailReturPemakaian'])->name('trDetailReturPemakaian')->middleware('auth');
+Route::post('trDetailReturPemakaian', [ReturPemakaianController::class, 'trDetailReturPemakaian_add'])->name('trDetailReturPemakaian.add')->middleware('auth');
+Route::get('stInvReturPemakaian/json', [ReturPemakaianController::class, 'stInvReturPemakaian_data'])->name('stInvReturPemakaian.data')->middleware('auth');
+Route::get('stInvReturPemakaianx/json', [ReturPemakaianController::class, 'stInvReturPemakaian_data_x'])->name('stInvReturPemakaianx.data')->middleware('auth');
+Route::get('trDetailReturPemakaian/showedit/{id}', [ReturPemakaianController::class, 'showEdit'])->name('trDetailReturPemakaian.showEdit')->middleware('auth');
+Route::post('trDetailReturPemakaian/edit', [ReturPemakaianController::class, 'trDetailReturPemakaian_edit'])->name('trDetailReturPemakaian.edit')->middleware('auth');
+Route::post('trDetailReturPemakaian/delete/', [ReturPemakaianController::class, 'trDetailReturPemakaian_del'])->name('trDetailReturPemakaian.del')->middleware('auth');
+
+Route::get('trHeaderKoreksiSo',[KoreksiSoController::class, 'trHeaderKoreksiSo'])->name('trHeaderKoreksiSo')->middleware('auth');
+Route::get('trHeaderKoreksiSo/json', [KoreksiSoController::class, 'trHeaderKoreksiSo_data'])->name('trHeaderKoreksiSo.data')->middleware('auth');
+Route::post('trHeaderKoreksiSo', [KoreksiSoController::class, 'trHeaderKoreksiSo_add'])->name('trHeaderKoreksiSo.add')->middleware('auth');
+Route::post('trHeaderKoreksiSo/delete/', [KoreksiSoController::class, 'trHeaderKoreksiSoDestroy_del'])->name('trHeaderKoreksiSoDestroy.del')->middleware('auth');
+
+Route::get('trDetailKoreksiSo/{id}', [KoreksiSoController::class, 'trDetailKoreksiSo'])->name('trDetailKoreksiSo')->middleware('auth');
+Route::post('trDetailKoreksiSo', [KoreksiSoController::class, 'trDetailKoreksiSo_add'])->name('trDetailKoreksiSo.add')->middleware('auth');
+Route::get('stInvKoreksiSo/json', [KoreksiSoController::class, 'stInvKoreksiSo_data'])->name('stInvKoreksiSo.data')->middleware('auth');
+Route::get('stInvKoreksiSox/json', [KoreksiSoController::class, 'stInvKoreksiSo_data_x'])->name('stInvKoreksiSox.data')->middleware('auth');
+Route::get('trDetailKoreksiSo/showedit/{id}', [KoreksiSoController::class, 'showEdit'])->name('trDetailKoreksiSo.showEdit')->middleware('auth');
+Route::post('trDetailKoreksiSo/edit', [KoreksiSoController::class, 'trDetailKoreksiSo_edit'])->name('trDetailKoreksiSo.edit')->middleware('auth');
+Route::post('trDetailKoreksiSo/delete/', [KoreksiSoController::class, 'trDetailKoreksiSo_del'])->name('trDetailKoreksiSo.del')->middleware('auth');
+
 Route::get('trHeaderPemakaianSpBbm',[PemakaianSpBbmController::class, 'trHeaderPemakaianSpBbm'])->name('trHeaderPemakaianSpBbm')->middleware('auth');
 Route::get('trHeaderPemakaianSpBbm/json', [PemakaianSpBbmController::class, 'trHeaderPemakaianSpBbm_data'])->name('trHeaderPemakaianSpBbm.data')->middleware('auth');
 Route::post('trHeaderPemakaianSpBbm', [PemakaianSpBbmController::class, 'trHeaderPemakaianSpBbm_add'])->name('trHeaderPemakaianSpBbm.add')->middleware('auth');
@@ -117,12 +148,61 @@ Route::post('trHeaderPemakaianSpBbm/delete/', [PemakaianSpBbmController::class, 
 Route::get('trDetailPemSpBbm/{id}', [PemakaianSpBbmController::class, 'trDetailPemSpBbm'])->name('trDetailPemSpBbm')->middleware('auth');
 // Route::get('trDetailPemSpBbm/showinv', [PemakaianSpBbmController::class, 'showInv'])->name('trDetailPemSpBbm.showInv')->middleware('auth');
 Route::get('stInvSpBbm/json', [PemakaianSpBbmController::class, 'stInvSpBbm_data'])->name('stInvSpBbm.data')->middleware('auth');
+Route::get('stInvSpBbmx/json', [PemakaianSpBbmController::class, 'stInvSpBbm_data_x'])->name('stInvSpBbmx.data')->middleware('auth');
 Route::post('trDetailPemSpBbm', [PemakaianSpBbmController::class, 'trDetailPemSpBbm_add'])->name('trDetailPemSpBbm.add')->middleware('auth');
+Route::get('trDetailPemSpBbm/showedit/{id}', [PemakaianSpBbmController::class, 'showEdit'])->name('trDetailPemSpBbm.showEdit')->middleware('auth');
+Route::post('trDetailPemSpBbm/edit', [PemakaianSpBbmController::class, 'trDetailPemSpBbm_edit'])->name('trDetailPemSpBbm.edit')->middleware('auth');
+Route::post('trDetailPemSpBbm/delete/', [PemakaianSpBbmController::class, 'trDetailPemSpBbm_del'])->name('trDetailPemSpBbm.del')->middleware('auth');
+
+Route::get('trHeaderPinGudSpBbm',[PinGudSpBbmController::class, 'trHeaderPinGudSpBbm'])->name('trHeaderPinGudSpBbm')->middleware('auth');
+Route::get('trHeaderPinGudSpBbm/json', [PinGudSpBbmController::class, 'trHeaderPinGudSpBbm_data'])->name('trHeaderPinGudSpBbm.data')->middleware('auth');
+Route::post('trHeaderPinGudSpBbm', [PinGudSpBbmController::class, 'trHeaderPinGudSpBbm_add'])->name('trHeaderPinGudSpBbm.add')->middleware('auth');
+Route::post('trHeaderPinGudSpBbm/delete/', [PinGudSpBbmController::class, 'trHeaderPinGudSpBbmDestroy_del'])->name('trHeaderPinGudSpBbmDestroy.del')->middleware('auth');
+
+Route::get('trDetailPinGudSpBbm/{id}', [PinGudSpBbmController::class, 'trDetailPinGudSpBbm'])->name('trDetailPinGudSpBbm')->middleware('auth');
+Route::get('stInvPgSpBbm/json', [PinGudSpBbmController::class, 'stInvPgSpBbm_data'])->name('stInvPgSpBbm.data')->middleware('auth');
+Route::get('stInvPgSpBbmx/json', [PinGudSpBbmController::class, 'stInvPgSpBbm_data_x'])->name('stInvPgSpBbmx.data')->middleware('auth');
+Route::post('trDetailPinGudSpBbm', [PinGudSpBbmController::class, 'trDetailPinGudSpBbm_add'])->name('trDetailPinGudSpBbm.add')->middleware('auth');
+Route::get('trDetailPinGudSpBbm/showedit/{id}', [PinGudSpBbmController::class, 'showEdit'])->name('trDetailPinGudSpBbm.showEdit')->middleware('auth');
+Route::post('trDetailPinGudSpBbm/edit', [PinGudSpBbmController::class, 'trDetailPinGudSpBbm_edit'])->name('trDetailPinGudSpBbm.edit')->middleware('auth');
+Route::post('trDetailPinGudSpBbm/delete/', [PinGudSpBbmController::class, 'trDetailPinGudSpBbm_del'])->name('trDetailPinGudSpBbm.del')->middleware('auth');
+
+Route::get('trHeaderRetPemSpBbm',[RetPemSpBbmController::class, 'trHeaderRetPemSpBbm'])->name('trHeaderRetPemSpBbm')->middleware('auth');
+Route::get('trHeaderRetPemSpBbm/json', [RetPemSpBbmController::class, 'trHeaderRetPemSpBbm_data'])->name('trHeaderRetPemSpBbm.data')->middleware('auth');
+Route::post('trHeaderRetPemSpBbm', [RetPemSpBbmController::class, 'trHeaderRetPemSpBbm_add'])->name('trHeaderRetPemSpBbm.add')->middleware('auth');
+Route::post('trHeaderRetPemSpBbm/delete/', [RetPemSpBbmController::class, 'trHeaderRetPemSpBbmDestroy_del'])->name('trHeaderRetPemSpBbmDestroy.del')->middleware('auth');
+
+Route::get('trDetailRetPemSpBbm/{id}', [RetPemSpBbmController::class, 'trDetailRetPemSpBbm'])->name('trDetailRetPemSpBbm')->middleware('auth');
+Route::get('stInvRpSpBbm/json', [RetPemSpBbmController::class, 'stInvRpSpBbm_data'])->name('stInvRpSpBbm.data')->middleware('auth');
+Route::get('stInvRpSpBbmx/json', [RetPemSpBbmController::class, 'stInvRpSpBbm_data_x'])->name('stInvRpSpBbmx.data')->middleware('auth');
+Route::post('trDetailRetPemSpBbm', [RetPemSpBbmController::class, 'trDetailRetPemSpBbm_add'])->name('trDetailRetPemSpBbm.add')->middleware('auth');
+Route::get('trDetailRetPemSpBbm/showedit/{id}', [RetPemSpBbmController::class, 'showEdit'])->name('trDetailRetPemSpBbm.showEdit')->middleware('auth');
+Route::post('trDetailRetPemSpBbm/edit', [RetPemSpBbmController::class, 'trDetailRetPemSpBbm_edit'])->name('trDetailRetPemSpBbm.edit')->middleware('auth');
+Route::post('trDetailRetPemSpBbm/delete/', [RetPemSpBbmController::class, 'trDetailRetPemSpBbm_del'])->name('trDetailRetPemSpBbm.del')->middleware('auth');
+
+Route::get('trHeaderKoreksiSpBbm',[KoreksiSpBbmController::class, 'trHeaderKoreksiSpBbm'])->name('trHeaderKoreksiSpBbm')->middleware('auth');
+Route::get('trHeaderKoreksiSpBbm/json', [KoreksiSpBbmController::class, 'trHeaderKoreksiSpBbm_data'])->name('trHeaderKoreksiSpBbm.data')->middleware('auth');
+Route::post('trHeaderKoreksiSpBbm', [KoreksiSpBbmController::class, 'trHeaderKoreksiSpBbm_add'])->name('trHeaderKoreksiSpBbm.add')->middleware('auth');
+Route::post('trHeaderKoreksiSpBbm/delete/', [KoreksiSpBbmController::class, 'trHeaderKoreksiSpBbmDestroy_del'])->name('trHeaderKoreksiSpBbmDestroy.del')->middleware('auth');
+
+Route::get('trDetailKoreksiSpBbm/{id}', [KoreksiSpBbmController::class, 'trDetailKoreksiSpBbm'])->name('trDetailKoreksiSpBbm')->middleware('auth');
+Route::get('stInvKoreksiSpBbm/json', [KoreksiSpBbmController::class, 'stInvKoreksiSpBbm_data'])->name('stInvKoreksiSpBbm.data')->middleware('auth');
+Route::get('stInvKoreksiSpBbmx/json', [KoreksiSpBbmController::class, 'stInvKoreksiSpBbm_data_x'])->name('stInvKoreksiSpBbmx.data')->middleware('auth');
+Route::post('trDetailKoreksiSpBbm', [KoreksiSpBbmController::class, 'trDetailKoreksiSpBbm_add'])->name('trDetailKoreksiSpBbm.add')->middleware('auth');
+Route::get('trDetailKoreksiSpBbm/showedit/{id}', [KoreksiSpBbmController::class, 'showEdit'])->name('trDetailKoreksiSpBbm.showEdit')->middleware('auth');
+Route::post('trDetailKoreksiSpBbm/edit', [KoreksiSpBbmController::class, 'trDetailKoreksiSpBbm_edit'])->name('trDetailKoreksiSpBbm.edit')->middleware('auth');
+Route::post('trDetailKoreksiSpBbm/delete/', [KoreksiSpBbmController::class, 'trDetailKoreksiSpBbm_del'])->name('trDetailKoreksiSpBbm.del')->middleware('auth');
 
 Route::get('trHeaderPemakaianBbm',[PemakaianBbmController::class, 'trHeaderPemakaianBbm'])->name('trHeaderPemakaianBbm')->middleware('auth');
 Route::get('trHeaderPemakaianBbm/json', [PemakaianBbmController::class, 'trHeaderPemakaianBbm_data'])->name('trHeaderPemakaianBbm.data')->middleware('auth');
 Route::post('trHeaderPemakaianBbm', [PemakaianBbmController::class, 'trHeaderPemakaianBbm_add'])->name('trHeaderPemakaianBbm.add')->middleware('auth');
 Route::post('trHeaderPemakaianBbm/delete/', [PemakaianBbmController::class, 'trHeaderPemakaianBbmDestroy_del'])->name('trHeaderPemakaianBbmDestroy.del')->middleware('auth');
+
+Route::get('trDetailPemBbm/{id}', [PemakaianBbmController::class, 'trDetailPemBbm'])->name('trDetailPemBbm')->middleware('auth');
+// Route::get('trDetailPemBbm/showinv', [PemakaianBbmController::class, 'showInv'])->name('trDetailPemBbm.showInv')->middleware('auth');
+Route::get('stInvBbm/json', [PemakaianBbmController::class, 'stInvBbm_data'])->name('stInvBbm.data')->middleware('auth');
+Route::post('trDetailPemBbm', [PemakaianBbmController::class, 'trDetailPemBbm_add'])->name('trDetailPemBbm.add')->middleware('auth');
+Route::post('trDetailPemBbm/delete/', [PemakaianBbmController::class, 'trDetailPemBbm_del'])->name('trDetailPemBbm.del')->middleware('auth');
 
 Route::get('stInvent',[StInventController::class, 'stInvent'])->name('stInvent')->middleware('auth');
 Route::get('stInvent/json', [StInventController::class, 'stInvent_data'])->name('stInvent.data')->middleware('auth');
@@ -139,6 +219,11 @@ Route::get('trHistory/json', [UserController::class, 'trHistory_data'])->name('t
 Route::get('periodeOperasional',[UserController::class, 'periodeOperasional'])->name('periodeOperasional')->middleware('auth');
 Route::post('periodeOperasional', [UserController::class, 'periodeOperasional_add'])->name('periodeOperasional.add')->middleware('auth');
 Route::get('periodeOperasional/{id_periode}', [UserController::class, 'periodeOperasional_actived'])->name('periodeOperasional.actived')->middleware('auth');
+
+
+
+
+
 
 // --------- TPN LAMA --------------------//
 Route::get('trHeaderTpnLm',[UserController::class, 'trHeaderTpnLm'])->name('trHeaderTpnLm')->middleware('auth');

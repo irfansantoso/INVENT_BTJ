@@ -19,24 +19,24 @@
     @endif
     <div class="card card-primary">
       <div class="card-header">
-        <h3 class="card-title">Detail Pemakaian Sparepart & BBM</h3>
+        <h3 class="card-title">Detail Pindah Gudang - 23</h3>
       </div>
       <!-- /.card-header -->
       <!-- form start -->
 
-      <form class="form-horizontal" action="{{ route('trDetailPemSpBbm.add') }}" method="POST">
+      <form class="form-horizontal" action="{{ route('trDetailPinGudSpBbm.add') }}" method="POST">
          @csrf        
         <input type="hidden" name="id_head_p_spbbm" id="id_head_p_spbbm" value="{{ $getHeaderPsb->id }}">
         <input type="hidden" name="no_ref" id="no_ref" value="{{ $getHeaderPsb->no_ref }}">
-        <input type="hidden" name="tgl_det_p_spbbm" id="tgl_det_p_spbbm" value="{{ $getHeaderPsb->tgl_p_sp_bbm }}">
-        <input type="hidden" name="no_sppb" id="no_sppb" value="{{ $getHeaderPsb->no_bpm }}">
+        <input type="hidden" name="tgl_det_p_spbbm" id="tgl_det_p_spbbm" value="{{ $getHeaderPsb->tgl_pg_sp_bbm }}">
+        <input type="hidden" name="no_sppb" id="no_sppb" value="{{ $getHeaderPsb->no_sppb }}">
         <input type="hidden" name="supplier" id="supplier" value="{{ $getHeaderPsb->supplier }}">
         <input type="hidden" name="kode_periode" id="kode_periode" value="{{ $getHeaderPsb->kode_periode }}">
         <input type="hidden" name="kd_area" id="kd_area" value="{{ $getHeaderPsb->kd_area }}">
 
         <div class="card-body">          
           <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-2">
               <div class="form-group">
                 <label>No Ref :</label><br/>
                   {{ $getHeaderPsb->no_ref }}
@@ -44,22 +44,36 @@
             </div>
             <div class="col-sm-2">
               <div class="form-group">
-                <label>No BPM :</label><br/>                
-                  {{ $getHeaderPsb->no_bpm }}
+                <label>No SPPB :</label><br/>                
+                  {{ $getHeaderPsb->no_sppb }}
               </div>
             </div>
             <div class="col-sm-2">
               <div class="form-group">
-                <label>Tgl Pemakaian :</label><br/>                
-                  {{ $getHeaderPsb->tgl_p_sp_bbm }}
+                <label>Tgl :</label><br/>                
+                  {{ $getHeaderPsb->tgl_pg_sp_bbm }}
               </div>
-            </div>            
-            <div class="col-sm-3">
+            </div>         
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
               <div class="form-group">
-                <label>Lokasi :</label><br/>
-                  {{ $getHeaderPsb->loc_activity }}
+                <label>Dari Area :</label><br/>
+                  {{ $getHeaderPsb->from_kd_area }}-{{ $getHeaderPsb->nmarea_f }}
               </div>
-            </div>          
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Ke Area :</label><br/>                
+                  {{ $getHeaderPsb->to_kd_area }}-{{ $getHeaderPsb->nmarea_t }}
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Keterangan :</label><br/>                
+                  {{ $getHeaderPsb->keterangan }}
+              </div>
+            </div>         
           </div>
           <hr>
           <div class="row">
@@ -146,7 +160,7 @@
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Tanggal</label>
-                  <input type="text" class="form-control" id="tgl" name="tgl" value="{{ $getHeaderPsb->tgl_p_sp_bbm }}" readonly>
+                  <input type="text" class="form-control" id="tgl" name="tgl" value="{{ $getHeaderPsb->tgl_pg_sp_bbm }}" readonly>
               </div>
             </div>
           </div>
@@ -164,7 +178,7 @@
     <div class="card">
       <!-- /.card-header -->
       <div class="card-body">
-        <table id="trDetailPemSpBbm" class="table table-bordered table-striped">
+        <table id="trDetailPinGudSpBbm" class="table table-bordered table-striped">
           <thead>
           <tr>
             <th>Kd Brg</th>
@@ -182,7 +196,7 @@
           </tr>
           </thead>
           <tbody>
-            @foreach ($getDetailPsb as $gds)
+            @foreach ($getDetailPgSb as $gds)
             <tr>              
                 <td>{{ $gds->kdbrg }}</td>
                 <td>{{ $gds->partnumb }}</td>
@@ -213,8 +227,8 @@
                   data-kdsts="{{ $gds->kd_sts }}"
                   data-stspakai="{{ $gds->stspakai }}" 
                   data-keterangan="{{ $gds->keterangan }}" 
-                  data-tgl_det_p_spbbm="{{ $gds->tgl_det_p_spbbm }}" class="edit btn btn-primary btn-sm editDetSpBbm" title="Edit"><i class="far fa-edit"></i></a>
-                  <a href="#" data-toggle="modal" data-target="#modal-delete" data-id="{{ $gds->id }}" data-kode="{{ $gds->kd_brg }}" class="btn btn-danger btn-sm delDetPemSpBbm" title="Delete"><i class="fa fa-trash"></i></a>
+                  data-tgl_pg_sp_bbm="{{ $getHeaderPsb->tgl_pg_sp_bbm }}" class="edit btn btn-primary btn-sm editDetPgSpBbm" title="Edit"><i class="far fa-edit"></i></a>
+                  <a href="#" data-toggle="modal" data-target="#modal-delete" data-id="{{ $gds->id }}" class="btn btn-danger btn-sm delDetPgSpBbm" title="Delete"><i class="fa fa-trash"></i></a>
                 </td>
             </tr>
             @endforeach                     
@@ -236,7 +250,7 @@
                 </div>
                 <div class="modal-body">
                     <div id="editForm"></div>           
-                    <form class="form-horizontal" action="{{ route('trDetailPemSpBbm.edit') }}" method="POST">
+                    <form class="form-horizontal" action="{{ route('trDetailPinGudSpBbm.edit') }}" method="POST">
                        @csrf
                       <input type="hidden" class="form-control" id="idx" name="id">
                       <input type="hidden" name="id_head_p_spbbmx" id="id_head_p_spbbm">
@@ -325,7 +339,7 @@
                           <div class="col-sm-2">
                             <div class="form-group">
                               <label>Tanggal</label>
-                                <input type="text" class="form-control" id="tglx" name="tgl" value="{{ $getHeaderPsb->tgl_p_sp_bbm }}" readonly>
+                                <input type="text" class="form-control" id="tglx" name="tgl" readonly>
                             </div>
                           </div>
                         </div>
@@ -576,10 +590,10 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('trDetailPemSpBbm.del') }}" method="post">
+                <form action="{{ route('trDetailPinGudSpBbm.del') }}" method="post">
                   {{ csrf_field() }}
                   <div class="modal-body">
-                      Apakah Anda yakin akan menghapus
+                      Apakah Anda yakin akan menghapus ID 
                       <span id="id-destroy2"></span> ?
                       <input type='hidden' name='del_id' id='id-destroy'>
                   </div>
@@ -717,13 +731,13 @@ $('#kel_brg').on('change', function (e) {
     $('#kd_brg').val(kel_brg);
 });
 
-$("#trDetailPemSpBbm").DataTable({
+$("#trDetailPinGudSpBbm").DataTable({
   "responsive": true, 
   "lengthChange": false, 
   "autoWidth": false,
   "order": [],
   "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-}).buttons().container().appendTo('#trDetailPemSpBbm_wrapper .col-md-6:eq(0)');
+}).buttons().container().appendTo('#trDetailPinGudSpBbm_wrapper .col-md-6:eq(0)');
 
 $(function () {
   $("#qty , #hrg_beli").keyup(function () {
@@ -748,7 +762,7 @@ $("body").on('keyup', "#qty-m , #hrg_beli-m", function() {
 
 //     $.ajax({
 //         type: 'GET',
-//         url: "{{URL::to('trDetailPemSpBbm/showinv')}}"
+//         url: "{{URL::to('trDetailPinGudSpBbm/showinv')}}"
 //     }).done( function( response ) {
 //         $('#showForm').html(response.html);
 //     });
@@ -842,66 +856,65 @@ $('#stInvSpBbm_x').DataTable({
   ],
 });
 
-$(document).on('click', '.editDetSpBbm', function() {
-        let id = $(this).attr('data-id');
-        let id_head_p_spbbm = $(this).attr('data-id_head_p_spbbm');
-        let kdbrg = $(this).attr('data-kdbrg');
-        var kelbrg = $(this).attr('data-kelbrg');
-        let partnumb = $(this).attr('data-partnumb');
-        let uk = $(this).attr('data-uk');
-        let uom = $(this).attr('data-uom');
-        let merk = $(this).attr('data-merk');
-        let qty = $(this).attr('data-qty');
-        let ket = $(this).attr('data-ket');        
-        let hrg_bel = $(this).attr('data-hrg_bel');
-        let kdfa = $(this).attr('data-kdfa');
-        let nmfa = $(this).attr('data-nmfa');
-        let kdsts = $(this).attr('data-kdsts');
-        let stspakai = $(this).attr('data-stspakai');
-        let keterangan = $(this).attr('data-keterangan');
-        let tgl_det_p_spbbm = $(this).attr('data-tgl_det_p_spbbm');
-        // alert(id_head_p_spbbm);
-        
-        $('#idx').val(id);
-        $('#id_head_p_spbbmx').val(id_head_p_spbbm);
-        $('#kd_brgx').val(kdbrg);
-        $('#kel_brgx').val(kelbrg);
-        $('#part_numbx').val(partnumb);
-        $('#ukuranx').val(uk);
-        $('#uomx').val(uom);
-        $('#merkx').val(merk);
-        $('#qtyx').val(qty);
-        $('#ketx').val(ket);
-        $('#nama_fax').val(nmfa);
-        $('#kode_fax').val(kdfa);
-        $('#hrg_belix').val(hrg_bel);
-        $('#nama_fax').val(nmfa);
-        $('#kode_fax').val(kdfa);
-        $('#kode_spx').val(kdsts);
-        $('#nama_spx').val(stspakai);
-        $('#keteranganx').val(keterangan);
-        $('#tglx').val(tgl_det_p_spbbm);
-        // $("#jns_kayu_m").val(ky).trigger('change');
-                
-    });
+$(document).on('click', '.editDetPgSpBbm', function() {
+    let id = $(this).attr('data-id');
+    let id_head_p_spbbm = $(this).attr('data-id_head_p_spbbm');
+    let kdbrg = $(this).attr('data-kdbrg');
+    var kelbrg = $(this).attr('data-kelbrg');
+    let partnumb = $(this).attr('data-partnumb');
+    let uk = $(this).attr('data-uk');
+    let uom = $(this).attr('data-uom');
+    let merk = $(this).attr('data-merk');
+    let qty = $(this).attr('data-qty');
+    let ket = $(this).attr('data-ket');        
+    let hrg_bel = $(this).attr('data-hrg_bel');
+    let kdfa = $(this).attr('data-kdfa');
+    let nmfa = $(this).attr('data-nmfa');
+    let kdsts = $(this).attr('data-kdsts');
+    let stspakai = $(this).attr('data-stspakai');
+    let keterangan = $(this).attr('data-keterangan');
+    let tgl_pg_sp_bbm = $(this).attr('data-tgl_pg_sp_bbm');
+    // alert(tgl_pg_sp_bbm);
+    
+    $('#idx').val(id);
+    $('#id_head_p_spbbmx').val(id_head_p_spbbm);
+    $('#kd_brgx').val(kdbrg);
+    $('#kel_brgx').val(kelbrg);
+    $('#part_numbx').val(partnumb);
+    $('#ukuranx').val(uk);
+    $('#uomx').val(uom);
+    $('#merkx').val(merk);
+    $('#qtyx').val(qty);
+    $('#ketx').val(ket);
+    $('#nama_fax').val(nmfa);
+    $('#kode_fax').val(kdfa);
+    $('#hrg_belix').val(hrg_bel);
+    $('#nama_fax').val(nmfa);
+    $('#kode_fax').val(kdfa);
+    $('#kode_spx').val(kdsts);
+    $('#nama_spx').val(stspakai);
+    $('#keteranganx').val(keterangan);
+    $('#tglx').val(tgl_pg_sp_bbm);
+    // $("#jns_kayu_m").val(ky).trigger('change');
+            
+});
 
-// $(document).on('click', '.editDetSpBbm', function() {
+$(document).on('click', '.delDetPgSpBbm', function() {
+    let id = $(this).attr('data-id');
+    $('#id-destroy').val(id);
+    $('#id-destroy2').html(id);
+});
+
+// $(document).on('click', '.editDetPgSpBbm', function() {
 //     let id = $(this).attr('data-id');
 
 //     $.ajax({
 //         type: 'GET',
-//         url: "{{ URL::to('trDetailPemSpBbm/showedit')}}"+"/"+id
+//         url: "{{ URL::to('trDetailPinGudSpBbm/showedit')}}"+"/"+id
 //     }).done( function( response ) {
 //         $('#editForm').html(response.html);
 //     });
 // });
 
-$(document).on('click', '.delDetPemSpBbm', function() {
-    let id = $(this).attr('data-id');
-    let dakod = $(this).attr('data-kode');
-    $('#id-destroy').val(id);
-    $('#id-destroy2').html(id);
-    $('#dakod').html(dakod);
-});
 </script> 
 @stop

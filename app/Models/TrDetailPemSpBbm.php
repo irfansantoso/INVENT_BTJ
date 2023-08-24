@@ -22,15 +22,15 @@ class TrDetailPemSpBbm extends Model
     protected $fillable = [
         'id_head_p_spbbm',
         'kd_brg',
-        'part_numb',
-        'qty',
-        'uom',
-        'harga_satuan',
-        'total',
-        'kd_fa',
-        'kd_sts',
-        'kode_periode',
         'tgl_det_p_spbbm',
+        'part_numb',
+        'kd_fa',
+        'qty',
+        'total',
+        'hrg_beli',
+        'uom',
+        'kd_sts',
+        'kode_periode',        
         'keterangan',        
         'user_created'
     ];

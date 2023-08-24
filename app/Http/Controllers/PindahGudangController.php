@@ -17,6 +17,15 @@ use Session;
 
 class PindahGudangController extends Controller
 {
+    public static function getKodePeriodeOperasional()
+    {
+        $getNPO = DB::table('periode_operasional')
+                        ->select('kode_periode')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
+        return $jsonx[0]['kode_periode'];
+    }
+
     public static function getNewNoRef($kd_area)
     {
         $getNPO = DB::table('periode_operasional')
@@ -76,15 +85,19 @@ class PindahGudangController extends Controller
         $saldoAwal =  TrHeaderPindahGudang::all();
         $supplier = Supplier::all();
 
-        $data['title'] = 'PENERIMAAN | 
-        PINDAH GUDANG';
+        $data['title'] = 'PENERIMAAN | PINDAH GUDANG';
         return view('transaction/penerimaan/trHeaderPindahGudang', $data, compact('saldoAwal','supplier'));
     }
 
     public function trHeaderPindahGudang_data(Request $request)
     {
         // $data = TrHeaderPindahGudang::query();
+        $getNPO = DB::table('periode_operasional')
+                        ->select('*')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
         $data =  TrHeaderPindahGudang::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
+                                    ->where('tr_header_saldo_awal.kode_periode',$jsonx[0]['kode_periode'])
                                     ->get(['tr_header_saldo_awal.*','ms.nama_supp as ns']);
 
         return Datatables::of($data)
@@ -112,7 +125,7 @@ class PindahGudangController extends Controller
                         ->get();
         $jsonx = json_decode($getNPO, true);
 
-        if($request->tgl_pb < $jsonx[0]['awal_tgl'] || $request->tgl_pb > $jsonx[0]['akhir_tgl'])
+        if($request->tgl_sa < $jsonx[0]['awal_tgl'] || $request->tgl_sa > $jsonx[0]['akhir_tgl'])
         {
            return redirect()->route('trHeaderPindahGudang')->with('error', 'Tanggal tidak sesuai dengan tahun periode!'); 
         }
@@ -128,7 +141,8 @@ class PindahGudangController extends Controller
             'supplier' => $request->supplier,            
             'kd_area' => $request->kd_area,
             'kode_periode' => $request->kode_periode,
-            'tgl_sa' => $request->tgl_sa,            
+            'tgl_sa' => $request->tgl_sa,
+            'keterangan' => $request->keterangan,
             'user_created' => Auth::user()->name
         ]);
         $trHeaderPindahGudang->save();
@@ -150,11 +164,16 @@ class PindahGudangController extends Controller
 
     public function trDetailPindahGudang($id_header_saldo_awal)
     {
-        $getHeaderSa = TrHeaderPindahGudang::find($id_header_saldo_awal);     
+        // $getHeaderSa = TrHeaderPindahGudang::find($id_header_saldo_awal);
+        $getHeaderSa = TrHeaderPindahGudang::leftJoin('mstr_kd_area as mkd', 'mkd.kode_area','=','tr_header_saldo_awal.kd_area')
+                                    ->leftJoin('mstr_kd_area as mkd2', 'mkd2.kode_area','=','tr_header_saldo_awal.from_kd_area')
+                                    ->leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')        
+                                    ->where('tr_header_saldo_awal.id','=',$id_header_saldo_awal)
+                                    ->first(['tr_header_saldo_awal.*','mkd.nama_area as nmarea','mkd2.nama_area as nmarea2','ms.nama_supp as nmsupp']);   
         $stInvent = StInvent::all();
         // $stInvent = StInvent::where('id_head_sa','=',$request->del_id)->get();
         $getDetailSa = TrDetailPindahGudang::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_saldo_awal.kd_brg')                                    
-                                    ->where('tr_detail_saldo_awal.id','=',$id_header_saldo_awal)
+                                    ->where('tr_detail_saldo_awal.id_head_sa','=',$id_header_saldo_awal)
                                     ->get(['tr_detail_saldo_awal.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran']);
  
         $data['title'] = 'Detail Pindah Gudang';
@@ -180,7 +199,8 @@ class PindahGudangController extends Controller
             'harga_satuan' => $request->harga_satuan,
             'total' => $request->total,
             'kode_periode' => $request->kode_periode,
-            'tgl_det_sa' => $request->tgl_det_sa,            
+            'tgl_det_sa' => $request->tgl_det_sa,
+            'keterangan' => $request->keterangan,
             'user_created' => Auth::user()->name,
             'created_at' => date('Y-m-d H:i:s'),
         ]);        
@@ -194,6 +214,19 @@ class PindahGudangController extends Controller
             $trDetailPindahGudang->save();
             return redirect()->route('trDetailPindahGudang',[$request->id_header_saldo_awal])->with('success', 'Tambah data sukses!');
         }
+    }
+
+    public function trDetailPindahGudang_del(Request $request)
+    {
+        $getDetSa =  TrDetailPindahGudang::where('id','=',$request->del_id)->get();
+        if ($getDetSa->isEmpty()) 
+        { 
+            return back()->with('error',' Failed, data tidak ada!');
+        }else{
+            TrDetailPindahGudang::find($request->del_id)->delete();
+            return back()->with('success',' Data deleted successfully');
+        }
+
     }
 
     public function stInvSa_data(Request $request)
@@ -223,20 +256,7 @@ class PindahGudangController extends Controller
                 ->rawColumns(['action'])
                 // ->toJson();
                 ->make(true);
-    }
-
-    public function trDetailPindahGudang_del(Request $request)
-    {
-        $getDetSa =  TrDetailPindahGudang::where('id','=',$request->del_id)->get();
-        if ($getDetSa->isEmpty()) 
-        { 
-            return back()->with('error',' Failed, data tidak ada!');
-        }else{
-            TrDetailPindahGudang::find($request->del_id)->delete();
-            return back()->with('success',' Data deleted successfully');
-        }
-
-    }
+    }    
 
     public function showEdit($id)
     {
