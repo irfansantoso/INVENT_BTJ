@@ -33,6 +33,9 @@
       <li class="nav-item">
         <a class="nav-link" id="custom-content-above-messages-tab" data-toggle="pill" href="#custom-content-above-messages" role="tab" aria-controls="custom-content-above-messages" aria-selected="false">Jenis Alat & Merk</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" id="custom-content-above-messages2-tab" data-toggle="pill" href="#custom-content-above-messages2" role="tab" aria-controls="custom-content-above-messages2" aria-selected="false">Jenis Alat & Merk 2</a>
+      </li>
     </ul>
     <div class="tab-content" id="custom-content-above-tabContent">
       <div class="tab-pane fade show active" id="custom-content-above-jnsalat" role="tabpanel" aria-labelledby="custom-content-above-jnsalat-tab">
@@ -98,6 +101,31 @@
               </thead>
               <tbody>
                 @foreach ($gabJnsAlatMerk as $gjam)
+                <tr>              
+                    <td>{{ $gjam->kode_jnsAlatMerk }}</td>
+                    <td>{{ $gjam->keterangan }}</td>
+                </tr>
+                @endforeach                     
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+      <div class="tab-pane fade" id="custom-content-above-messages2" role="tabpanel" aria-labelledby="custom-content-above-messages2-tab">
+        <div class="card">
+          <!-- /.card-header -->
+          <div class="card-body">
+            <table id="example5" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>Kode </th>
+                <th>Keterangan</th>
+              </tr>
+              </thead>
+              <tbody>
+                @foreach ($gabJnsAlatMerk2 as $gjam)
                 <tr>              
                     <td>{{ $gjam->kode_jnsAlatMerk }}</td>
                     <td>{{ $gjam->keterangan }}</td>

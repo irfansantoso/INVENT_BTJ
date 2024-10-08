@@ -18,13 +18,16 @@
         <p class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">×</button>{{ $error }}</p>
       @endforeach
     @endif
+
+    @auth
+    @if(Auth::user()->level != "logisticUser")
     <div class="card card-primary">
       <div class="card-header">
         <h3 class="card-title">Header Pindah Gudang</h3>
       </div>
       <!-- /.card-header -->
       <!-- form start -->
-
+      
       <form class="form-horizontal" action="{{ route('trHeaderPb.add') }}" method="POST">
          @csrf        
         <div class="card-body">          
@@ -103,8 +106,10 @@
           <button class="btn btn-success">Simpan</button>
         </div>
         <!-- /.card-footer -->
-      </form>              
+      </form>                  
     </div>
+    @endif
+    @endauth
       <!-- /.card -->
     
     <div class="card">
@@ -126,6 +131,25 @@
       <!-- /.card-body -->
     </div>
     <!-- /.card -->
+
+    <!-- Modal EDiT Show -->
+    <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="modal-edit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header">Edit Form
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="editForm"></div>           
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal EDiTShow -->
+
     <!-- Modal -->
     <div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
         aria-hidden="true">
@@ -194,17 +218,17 @@ $('#trHeaderPb').DataTable({
         data: 'action',
         name: 'action',
         orderable: false, 
-        searchable: false
+        searchable: true
     }
   ],
 });
 
-$(document).on('click', '.editStInvent', function() {
+$(document).on('click', '.editHeadPb', function() {
     let id = $(this).attr('data-id');
 
     $.ajax({
         type: 'GET',
-        url: "{{ URL::to('stInvent/showedit')}}"+"/"+id
+        url: "{{ URL::to('trHeaderPb/showedit')}}"+"/"+id
     }).done( function( response ) {
         $('#editForm').html(response.html);
     });

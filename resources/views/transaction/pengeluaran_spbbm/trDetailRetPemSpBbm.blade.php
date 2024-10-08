@@ -656,7 +656,11 @@ $(document).on('click', '.clickInv', function() {
     var uom = $(this).attr('data-uom');
     var merk = $(this).attr('data-merk');
     var ket = $(this).attr('data-ket');
-    var hrg_sat = $(this).attr('data-hrg_sat');
+    // var hrg_sat = $(this).attr('data-hrg_sat');
+    var qty_temp = $(this).attr('data-qty');
+    var nilai = $(this).attr('data-nilai');
+    var hrg_beli = nilai/qty_temp;
+    var hrg_beli_x = parseFloat(hrg_beli.toFixed(4));
     
     $('#id').val(id);
     $('#kd_brg').val(kdbrg);
@@ -666,7 +670,7 @@ $(document).on('click', '.clickInv', function() {
     $('#uom').val(uom);
     $('#merk').val(merk);
     $('#ket').val(ket);
-    $('#hrg_beli').val(hrg_sat);
+    $('#hrg_beli').val(hrg_beli_x);
     $('#modInv').modal('hide');
 });
 

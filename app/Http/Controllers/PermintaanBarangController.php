@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\TrHeaderPb;
 use App\Models\TrDetailPb;
 use App\Models\StInvent;
+use App\Exports\ExportPb;
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
+use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Session;
+use PDF;
 
 class PermintaanBarangController extends Controller
 {
@@ -32,11 +35,13 @@ class PermintaanBarangController extends Controller
                         ->get();
 
         $jsonz = json_decode($getLastNo, true);
-        $kp = substr($jsonx[0]['kode_periode'], 3, 2);
+        // $kp = substr($jsonx[0]['kode_periode'], 3, 2);
+        // $romawi = Helper::angkaKeRomawi($kp);
+        $kp = (int)substr($jsonx[0]['kode_periode'], 2, 2); // extracts '09' or '10'
         $romawi = Helper::angkaKeRomawi($kp);
         $newNo1 = "BTJ-ORD"."/".$romawi."/".$jsonx[0]['tahun_periode'];
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_pb'], 3, 1);
+            $nourut = substr($jsonz[0]['no_pb'], 0, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut)."/";
             return $newNo2.$newNo1;
@@ -56,9 +61,18 @@ class PermintaanBarangController extends Controller
 
     public function trHeaderPb_data(Request $request)
     {
-        $data = TrHeaderPb::query();
-        // $data =  TrHeaderPb::leftJoin('mstr_supplier as ms', 'ms.kode_supp','=','tr_header_saldo_awal.supplier')
-        //                             ->get(['tr_header_saldo_awal.*','ms.nama_supp as ns']);
+        $getNPO = DB::table('periode_operasional')
+                        ->select('tahun_periode','kode_periode')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
+
+        $data = DB::table('tr_header_pb')
+                        ->select('*')
+                        ->where('kode_periode','=',$jsonx[0]['kode_periode'])
+                        ->orderBy('no_pb','desc')
+                        ->get();
+        // $data = TrHeaderPb::query();
+
 
         return Datatables::of($data)
                 ->setTotalRecords(100)
@@ -67,6 +81,7 @@ class PermintaanBarangController extends Controller
                     
                     $btn = '<a href="'. url('trDetailPb').'/'.$data->id.'" class="edit btn btn-primary btn-sm">Detail</a>';
                     if(Auth::user()->level == "administrator"){
+                    $btn .= '<a href="#" data-toggle="modal" data-target="#modal-edit" data-id="'.$data->id.'" data-kode="'.$data->no_pb.'" class="btn btn-dark btn-sm editHeadPb" title="Edit">Edit</a>';
                     $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-kode="'.$data->no_pb.'" class="btn btn-danger btn-sm delStInvent" title="Delete">Delete</a>';
                     }
                     return $btn;
@@ -111,7 +126,109 @@ class PermintaanBarangController extends Controller
         ]);        
 
         $trHeaderPb->save();
-        return redirect()->route('trHeaderPb')->with('success', 'Tambah data sukses!');
+        $getIdHead = DB::table('tr_header_pb')
+                        ->select('*')->where('no_pb',$request->no_pb)
+                        ->get();
+        $jdIdHead = json_decode($getIdHead, true);
+        return redirect()->route('trDetailPb',$jdIdHead[0]['id'])->with('success', 'Tambah data header sukses!');
+    }
+
+    public function showEditHead($id)
+    {        
+        $headerPb = TrHeaderPb::where('id','=',$id)
+                                    ->get(['*']);
+
+        $html ='        
+        <form class="form-horizontal" method="POST" action="'.route('trHeaderPb.edit').'">
+        '. csrf_field() .'
+        <input type="hidden" value="'.$id.'" name="idM">
+        <div class="card-body">
+          <div class="row">            
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>No PB</label>
+                  <input type="text" class="form-control" id="" name="" value="'.$headerPb[0]['no_pb'].'" readonly="readonly">        
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Tanggal</label>
+                  <input type="text" class="form-control" name="tgl_pb" value="'.$headerPb[0]['tgl_pb'].'" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>
+              </div>
+            </div>
+                       
+          </div>
+
+          <div class="row">            
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Kode Unit</label>
+                  <input type="text" class="form-control" id="kd_unit" name="kd_unit" value="'.$headerPb[0]['kd_unit'].'">        
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Status</label>
+                  <input type="text" class="form-control" id="status_pb" name="status_pb" value="'.$headerPb[0]['status_pb'].'">
+              </div>
+            </div>
+                       
+          </div>
+
+          <div class="row">            
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label>Camp Manager</label>
+                  <input type="text" class="form-control" id="camp_manager" name="camp_manager" value="'.$headerPb[0]['camp_manager'].'">        
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Kepala Gudang</label>
+                  <input type="text" class="form-control" id="kepala_gudang" name="kepala_gudang" value="'.$headerPb[0]['kepala_gudang'].'">
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Kepala Mekanik</label>
+                  <input type="text" class="form-control" id="kepala_mekanik" name="kepala_mekanik" value="'.$headerPb[0]['kepala_mekanik'].'">
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Mekanik</label>
+                  <input type="text" class="form-control" id="mekanik" name="mekanik" value="'.$headerPb[0]['mekanik'].'">
+              </div>
+            </div>
+                       
+          </div>
+          
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-success">Simpan</button>
+        </div>
+        </form>';
+        
+
+        $response['html'] = $html; 
+        return response()->json($response);
+
+    }
+
+    public function trHeaderPb_edit(Request $request)
+    {
+        TrHeaderPb::where('id', $request->idM)
+                  ->update(['tgl_pb' => $request->tgl_pb,
+                            'kd_unit' => $request->kd_unit,
+                            'status_pb' => $request->status_pb,
+                            'camp_manager' => $request->camp_manager,
+                            'kepala_gudang' => $request->kepala_gudang,
+                            'kepala_mekanik' => $request->kepala_mekanik,
+                            'mekanik' => $request->mekanik,
+                            'updated_at' => date('Y-m-d H:i:s')
+                            ]);
+        return redirect()->route('trHeaderPb')->with('success', 'Edit data sukses!');
+        // return back()->with('success',' Edit Data Header successfully');
     }
 
     public function trHeaderPbDestroy_del(Request $request)
@@ -132,9 +249,10 @@ class PermintaanBarangController extends Controller
         $getHeaderPb = TrHeaderPb::find($id_header_pb);
         $stInvent = StInvent::all();
         // $stInvent = StInvent::where('id_head_pb','=',$request->del_id)->get();
-        $getDetailPb = TrDetailPb::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_pb.kd_brg')                                    
-                                    ->where('tr_detail_pb.id_header_pb','=',$id_header_pb)
-                                    ->get(['tr_detail_pb.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran']);
+        $getDetailPb = TrDetailPb::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_pb.kd_brg')   
+                                    ->leftJoin('temp_qty as tq', 'tq.kd_brg','=','tr_detail_pb.kd_brg')
+                                    ->where('tr_detail_pb.id_head_pb','=',$id_header_pb)
+                                    ->get(['tr_detail_pb.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran','tq.qty as jumQty']);
  
         $data['title'] = 'Detail Permintaan Barang';
         return view('transaction/trDetailPb', $data, compact('getHeaderPb','stInvent','getDetailPb'));
@@ -147,15 +265,17 @@ class PermintaanBarangController extends Controller
             'kd_brg' => 'required',
         ]);
 
-        $gLock = DB::table('temp_qty')
-                        ->select('lock_pb')->where('kd_brg', $request->kd_brg)
-                        ->get();
-        $jsLock = json_decode($gLock, true);
+        // if (DB::table('temp_qty')->where('kd_brg', $request->kd_brg)->exists()) {
+        //     $gLock = DB::table('temp_qty')
+        //                     ->select('lock_pb')->where('kd_brg', $request->kd_brg)
+        //                     ->get();
+        //     $jsLock = json_decode($gLock, true);
 
-        if($jsLock[0]['lock_pb'] == 1){
-            return back()->with('error',' Failed, Stock masih ada!');
-        }
-        exit();
+        //     if($jsLock[0]['lock_pb'] == 1){
+        //         return back()->with('error',' Failed, Stock masih ada!');
+        //     }
+        // }
+
         $trDetailPb = new TrDetailPb([
             'id_head_pb' => $request->id_header_pb,
             'kd_brg' => $request->kd_brg,
@@ -179,6 +299,33 @@ class PermintaanBarangController extends Controller
             $trDetailPb->save();
             return redirect()->route('trDetailPb',[$request->id_header_pb])->with('success', 'Tambah data sukses!');
         }
+    }
+
+    public function trDetailPb_edit(Request $request)
+    {
+
+        TrDetailPb::where('id', $request->id)
+                  ->update([
+                            'qty' => $request->qty,
+                            'user_created' => Auth::user()->name,
+                            'updated_at' => date('Y-m-d H:i:s'),
+                            ]);
+        // return redirect()->route('trDetailReturPemakaian',[$request->id_head_retur_pemakaian])->with('success', 'Ubah data sukses!');
+                  return back()->with('success',' Ubah data successfully');
+
+    }
+
+    public function trDetailPb_del(Request $request)
+    {
+        $getDetPb =  TrDetailPb::where('id','=',$request->del_id)->get();
+        if ($getDetPb->isEmpty()) 
+        { 
+            return back()->with('error',' Failed, data tidak ada!');
+        }else{
+            TrDetailPb::find($request->del_id)->delete();
+            return back()->with('success',' Data deleted successfully');
+        }
+
     }
 
     public function stInvPb_data(Request $request)
@@ -210,5 +357,20 @@ class PermintaanBarangController extends Controller
                 // ->toJson();
                 ->make(true);
     }  
+
+    public function printPb_rpt($id_header_pb)
+    { 
+        // $fileNm = "BUKTI PERMINTAAN BARANG.xlsx";
+        //     return Excel::download(new ExportPb($id), $fileNm);
+        $getHeaderPb = TrHeaderPb::find($id_header_pb);
+        $getDetailPb = TrDetailPb::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_pb.kd_brg')   
+                                    ->leftJoin('mstr_jnsalat_merk_2 as mjam', 'mjam.kode_jnsAlatMerk','=','tris.kel_brg')
+                                    ->leftJoin('temp_qty as tq', 'tq.kd_brg','=','tr_detail_pb.kd_brg')
+                                    ->where('tr_detail_pb.id_head_pb','=',$id_header_pb)
+                                    ->get(['tr_detail_pb.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran','mjam.keterangan as ketjnsalat','tq.qty as jumQty']);
+
+        $pdf = PDF::loadView('reporting/rpt_printPb',['getHeaderPb' => $getHeaderPb,'getDetailPb' => $getDetailPb]);
+        return $pdf->download('BUKTI PERMINTAAN BARANG_'.date('Y-m-d_H-i-s').'.pdf');
+    }
 
 }

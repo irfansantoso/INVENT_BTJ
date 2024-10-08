@@ -59,12 +59,6 @@
                   <input type="text" class="form-control" name="ukuran">                
               </div>
             </div>
-            <div class="col-sm-2">
-              <div class="form-group">
-                <label>Qty</label>                
-                  <input type="text" class="form-control" name="qty_inv">                
-              </div>
-            </div>
             <div class="col-sm-1">
               <div class="form-group">
                 <label>UOM</label>                
@@ -188,7 +182,7 @@
                     </button>
                 </div>
                 <form action="{{ route('stInvent.openlock') }}" method="post">
-                  {{ csrf_field() }}
+                  @csrf
                   <div class="modal-body">
                       Apakah Anda yakin akan membuka lock stock kode barang ini
                       <span id="opkod"></span> ?
@@ -256,7 +250,7 @@ $('#stInvent').DataTable({
         data: 'action',
         name: 'action',
         orderable: false, 
-        searchable: false
+        searchable: true
     }
   ],
 });

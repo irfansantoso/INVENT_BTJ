@@ -38,13 +38,16 @@
                 <option value="gab_jnsalat_merk">
                     Gab.Jenis Alat & Merk
                 </option>
+                <option value="gab_jnsalat_merk_2">
+                    Gab.Jenis Alat & Merk 2
+                </option>
               </select>
             </div>
           </div>
           <div class="form-group row" id="kode_jnsAlat_show" style="display:none;">
             <label for="" class="col-sm-2 col-form-label">Kode JenisAlat</label>
             <div class="col-sm-3">
-              <input type="text" class="form-control" id="kode_jnsAlat" name="kode_jnsAlat" placeholder="Kode" autofocus="autofocus">
+              <input type="text" class="form-control" id="kode_jnsAlat" name="kode_jnsAlat" placeholder="Kode">
             </div>
           </div>
           <div class="form-group row" id="nama_jnsAlat_show" style="display:none;">
@@ -56,7 +59,7 @@
           <div class="form-group row" id="kode_merk_show" style="display:none;">
             <label for="" class="col-sm-2 col-form-label">Kode Merk</label>
             <div class="col-sm-3">
-              <input type="text" class="form-control" id="kode_merk" name="kode_merk" placeholder="Kode" autofocus="autofocus">
+              <input type="text" class="form-control" id="kode_merk" name="kode_merk" placeholder="Kode">
             </div>
           </div>
           <div class="form-group row" id="nama_merk_show" style="display:none;">
@@ -68,7 +71,7 @@
           <div class="form-group row" id="list_jnsAlat_show" style="display:none;">
             <label for="account" class="col-sm-2 col-form-label">Jenis Alat</label>
             <div class="col-sm-3">
-              <select class="form-control m-input" id="kodeJnsAlat" name="kodeJnsAlat" required="true">
+              <select class="form-control m-input" id="kodeJnsAlat" name="kodeJnsAlat">
                 <option value="">
                     -- Pilih Jenis Alat --
                 </option>
@@ -81,7 +84,7 @@
           <div class="form-group row" id="list_merk_show" style="display:none;">
             <label for="account" class="col-sm-2 col-form-label">Merk</label>
             <div class="col-sm-3">
-              <select class="form-control m-input" id="kodeMerk" name="kodeMerk" required="true">
+              <select class="form-control m-input" id="kodeMerk" name="kodeMerk">
                 <option value="" data-m=" ">
                     -- Pilih Merk --
                 </option>
@@ -94,7 +97,7 @@
           <div class="form-group row" id="kode_jnsAlatMerk_show" style="display:none;">
             <label for="" class="col-sm-2 col-form-label">Kode Gab</label>
             <div class="col-sm-3">
-              <input type="text" class="form-control" id="kode_jnsAlatMerk" name="kode_jnsAlatMerk" placeholder="Kode" autofocus="autofocus">
+              <input type="text" class="form-control" id="kode_jnsAlatMerk" name="kode_jnsAlatMerk" placeholder="Kode">
             </div>
           </div>
           <div class="form-group row" id="keterangan_show" style="display:none;">

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProcessGlobalController;
+use App\Http\Controllers\ProcessQtyController;
 use App\Models\StInvent;
 use App\Models\GabJnsAlatMerk;
+use App\Models\GabJnsAlatMerk2;
 use App\Models\MerkBrg;
 use App\Models\ProcessQty;
 use Illuminate\Http\Request;
@@ -18,10 +21,22 @@ class StInventController extends Controller
 {
     public function stInvent()
     {
-        $stInvent =  StInvent::all();
+        // $stInvent =  StInvent::all();
+        $stInventChunks = [];
+        StInvent::cursor()->each(function ($stInventRecord) use (&$stInvent) {
+            $stInvent[] = $stInventRecord->toArray();
+        });
 
-        $gabJnsAlatMerk = GabJnsAlatMerk::all();
+        $gabJnsAlatMerk = GabJnsAlatMerk2::all();
         $merkBrg = MerkBrg::all();
+
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
 
         $data['title'] = 'Stock Invent';
         return view('transaction/stInvent', $data, compact('stInvent','gabJnsAlatMerk','merkBrg'));
@@ -70,13 +85,20 @@ class StInventController extends Controller
             'kel_brg' => $request->kel_brg,
             'part_numb' => $request->part_numb,
             'ukuran' => $request->ukuran,
-            'qty_inv' => $request->qty_inv,
+            // 'qty_inv' => $request->qty_inv,
             'uom' => $request->uom,
             'merk' => $request->merk,
             'status' => $request->status,
             'max_qty' => $request->max_qty,
         ]);
         $stInvent->save();
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
         return redirect()->route('stInvent')->with('success', 'Tambah data sukses!');
     }
 
@@ -128,12 +150,6 @@ class StInventController extends Controller
                   <input type="text" class="form-control" name="ukuran" value="'.$stcInvent->ukuran.'">                
               </div>
             </div>
-            <div class="col-sm-2">
-              <div class="form-group">
-                <label>Qty</label>                
-                  <input type="text" class="form-control" name="qty_inv" value="'.$stcInvent->qty_inv.'">                
-              </div>
-            </div>
             <div class="col-sm-1">
               <div class="form-group">
                 <label>UOM</label>                
@@ -178,7 +194,7 @@ class StInventController extends Controller
         StInvent::where('id', $request->idM)
                   ->update(['part_numb' => $request->part_numb,
                             'ukuran' => $request->ukuran,
-                            'qty_inv' => $request->qty_inv,
+                            // 'qty_inv' => $request->qty_inv,
                             'uom' => $request->uom,
                             'merk' => $request->merk,
                             'status' => $request->status,
@@ -202,15 +218,14 @@ class StInventController extends Controller
 
     public function stInvent_openlock(Request $request)
     {      
-      
         DB::beginTransaction();
         try{
             // echo $request->openlock_kdbrg;
             // exit();
             ProcessQty::where('kd_brg', $request->openlock_kdbrg)
-                ->update(['lock_pb' => 0]);
+                      ->update(['lock_pb' => 0]);
             DB::commit();
-            return redirect()->route('stInvent')->with('success', 'Edit data sukses!');
+            return back()->with('success', 'Edit data sukses!');
         }catch(\Exception $e){
             DB::rollback();
             return back()->with('error',' There is some problem, please try again or call your admin!');

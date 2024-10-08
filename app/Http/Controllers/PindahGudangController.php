@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProcessGlobalController;
+use App\Http\Controllers\ProcessQtyController;
 use App\Models\TrHeaderPindahGudang;
 use App\Models\TrDetailPindahGudang;
 use App\Models\StInvent;
@@ -43,7 +45,7 @@ class PindahGudangController extends Controller
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode']."/";
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_ref'], 13, 4);
+            $nourut = substr($jsonz[0]['no_ref'], 10, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -70,7 +72,7 @@ class PindahGudangController extends Controller
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode'];
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_sppb'],  7, 4);
+            $nourut = substr($jsonz[0]['no_sppb'],  4, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -84,6 +86,14 @@ class PindahGudangController extends Controller
     {
         $saldoAwal =  TrHeaderPindahGudang::all();
         $supplier = Supplier::all();
+
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
 
         $data['title'] = 'PENERIMAAN | PINDAH GUDANG';
         return view('transaction/penerimaan/trHeaderPindahGudang', $data, compact('saldoAwal','supplier'));
@@ -107,6 +117,7 @@ class PindahGudangController extends Controller
                     
                     $btn = '<a href="'. url('trDetailPindahGudang').'/'.$data->id.'" class="edit btn btn-primary btn-sm">Detail</a>';
                     if(Auth::user()->level == "administrator"){
+                    $btn .= '<a href="#" data-toggle="modal" data-target="#modal-edit" data-id="'.$data->id.'" data-kode="'.$data->no_sppb.'" class="btn btn-primary btn-sm editHeadPinGud" title="Edit">Edit</a>';
                     $btn .= '<a href="#" data-toggle="modal" data-target="#modal-delete" data-id="'.$data->id.'" data-kode="'.$data->no_sppb.'" class="btn btn-danger btn-sm delStInvent" title="Delete">Delete</a>';
                     }
                     return $btn;
@@ -127,7 +138,10 @@ class PindahGudangController extends Controller
 
         if($request->tgl_sa < $jsonx[0]['awal_tgl'] || $request->tgl_sa > $jsonx[0]['akhir_tgl'])
         {
-           return redirect()->route('trHeaderPindahGudang')->with('error', 'Tanggal tidak sesuai dengan tahun periode!'); 
+            return back()
+                    ->withInput()
+                    ->with('error','Tanggal tidak sesuai dengan tahun periode!');
+           // return redirect()->route('trHeaderPindahGudang')->with('error', 'Tanggal tidak sesuai dengan tahun periode!'); 
         }
         
         $request->validate([
@@ -140,13 +154,74 @@ class PindahGudangController extends Controller
             'no_sppb' => $request->no_sppb,
             'supplier' => $request->supplier,            
             'kd_area' => $request->kd_area,
+            'from_kd_area' => $request->from_kd_area,
             'kode_periode' => $request->kode_periode,
             'tgl_sa' => $request->tgl_sa,
             'keterangan' => $request->keterangan,
             'user_created' => Auth::user()->name
         ]);
         $trHeaderPindahGudang->save();
-        return redirect()->route('trHeaderPindahGudang')->with('success', 'Tambah data sukses!');
+        $getIdHead = DB::table('tr_header_saldo_awal')
+                        ->select('*')->where('no_ref',$request->no_ref)
+                        ->get();
+        $jdIdHead = json_decode($getIdHead, true);
+        return redirect()->route('trDetailPindahGudang',$jdIdHead[0]['id'])->with('success', 'Tambah data sukses!');
+    }
+
+    public function showEditHead($id)
+    {
+        // $headerSaldoAwal = TrHeaderPindahGudang::find($id);
+        $headerSaldoAwal = TrHeaderPindahGudang::where('id','=',$id)
+                                    ->get(['*']);
+        // $supplier = Supplier::all();
+
+        $html ='        
+        <form class="form-horizontal" method="POST" action="'.route('trHeaderPindahGudang.edit').'">
+        '. csrf_field() .'
+        <input type="hidden" value="'.$id.'" name="idM">
+        <div class="card-body">          
+          <div class="row">            
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>No Ref</label>
+                  <input type="text" class="form-control" id="no_ref" name="no_ref" value="'.$headerSaldoAwal[0]['no_ref'].'">        
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>No SPPB / PO</label>
+                  <input type="text" class="form-control" id="no_sppb" name="no_sppb" value="'.$headerSaldoAwal[0]['no_sppb'].'">
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Tanggal</label>                
+                  <input type="text" class="form-control" name="tgl_sa" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask value="'.$headerSaldoAwal[0]['tgl_sa'].'">                
+              </div>
+            </div>            
+          </div>
+          
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-success">Simpan</button>
+        </div>
+        </form>';
+        
+
+        $response['html'] = $html; 
+        return response()->json($response);
+
+    }
+
+    public function trHeaderPindahGudang_edit(Request $request)
+    {
+        TrHeaderPindahGudang::where('id', $request->idM)
+                  ->update(['no_ref' => $request->no_ref,
+                            'no_sppb' => $request->no_sppb,
+                            'tgl_sa' => $request->tgl_sa
+                            ]);
+        return redirect()->route('trHeaderPindahGudang')->with('success', 'Edit data sukses!');
+        // return back()->with('success',' Edit Data Header successfully');
     }
 
     public function trHeaderPindahGudangDestroy_del(Request $request)
@@ -212,6 +287,13 @@ class PindahGudangController extends Controller
             return redirect('/');
         }else{
             $trDetailPindahGudang->save();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return redirect()->route('trDetailPindahGudang',[$request->id_header_saldo_awal])->with('success', 'Tambah data sukses!');
         }
     }
@@ -224,6 +306,13 @@ class PindahGudangController extends Controller
             return back()->with('error',' Failed, data tidak ada!');
         }else{
             TrDetailPindahGudang::find($request->del_id)->delete();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return back()->with('success',' Data deleted successfully');
         }
 
@@ -261,14 +350,16 @@ class PindahGudangController extends Controller
     public function showEdit($id)
     {
         // $detailSaldoAwal = TrDetailPindahGudang::find($id);
-        $detailSaldoAwal = TrDetailPindahGudang::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_saldo_awal.kd_brg')                                    
+        $detailSaldoAwal = TrDetailPindahGudang::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_saldo_awal.kd_brg')
+                                    ->leftJoin('tr_header_saldo_awal as trhsa', 'trhsa.id','=','tr_detail_saldo_awal.id_head_sa')       
                                     ->where('tr_detail_saldo_awal.id','=',$id)
-                                    ->get(['tr_detail_saldo_awal.*','tris.kd_brg as kdbrg','tris.ukuran as ukuran']);
+                                    ->get(['tr_detail_saldo_awal.*','tris.ukuran as ukuran','trhsa.kode_periode as kode_periode']);
         $html ='        
         <form class="form-horizontal" method="POST" action="'.route('trDetailPindahGudang.edit').'">
         '. csrf_field() .'
         <input type="hidden" value="'.$id.'" name="idM">
         <input type="hidden" value="'.$detailSaldoAwal[0]['id_head_sa'].'" name="id_head_sa">
+        <input type="hidden" value="'.$detailSaldoAwal[0]['kode_periode'].'" name="kode_periode">
         <div class="card-body">          
           <div class="row">            
             <div class="col-sm-2">
@@ -334,8 +425,18 @@ class PindahGudangController extends Controller
         TrDetailPindahGudang::where('id', $request->idM)
                   ->update(['qty' => $request->qty,
                             'harga_satuan' => $request->harga_satuan,
-                            'total' => $request->total
+                            'total' => $request->total,
+                            'kode_periode' => $request->kode_periode,
                             ]);
+                  
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
+
         return redirect()->route('trDetailPindahGudang',[$request->id_head_sa])->with('success', 'Edit data sukses!');
     }
 

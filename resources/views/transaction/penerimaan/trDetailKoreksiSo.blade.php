@@ -107,19 +107,13 @@
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Harga Satuan</label>
-                  <input type="text" class="form-control" id="hrg_sat" name="hrg_satuan" readonly>
+                  <input type="text" class="form-control" id="hrg_sat" name="hrg_satuan">
               </div>
             </div>
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Harga Beli</label>
                   <input type="text" class="form-control" id="hrg_beli" name="hrg_beli" readonly>
-              </div>
-            </div>
-            <div class="col-sm-2">
-              <div class="form-group">
-                <label>Total</label>
-                  <input type="text" class="form-control" id="total" name="total" readonly>
               </div>
             </div>                   
           </div>          
@@ -269,13 +263,7 @@
                               <label>Harga Beli</label>
                                 <input type="text" class="form-control" id="hrg_belix" name="hrg_beli" readonly>
                             </div>
-                          </div>
-                          <div class="col-sm-2">
-                            <div class="form-group">
-                              <label>Total</label>
-                                <input type="text" class="form-control" id="totalx" name="total" readonly>
-                            </div>
-                          </div>                     
+                          </div>                    
                         </div>                        
                         <div class="row">
                           <div class="col-sm-4">
@@ -438,7 +426,11 @@ $(document).on('click', '.clickInv', function() {
     var partnumb = $(this).attr('data-partnumb');
     var uk = $(this).attr('data-uk');
     var uom = $(this).attr('data-uom');
-    var hrg_sat = $(this).attr('data-hrg_sat');
+    // var hrg_sat = $(this).attr('data-hrg_sat');
+    var qty_temp = $(this).attr('data-qty');
+    var nilai = $(this).attr('data-nilai');
+    var hrg_sat = nilai/qty_temp;
+    var hrg_sat_x = parseFloat(hrg_sat.toFixed(4));
     // alert(hrg_sat);
     
     $('#id').val(id);
@@ -447,7 +439,7 @@ $(document).on('click', '.clickInv', function() {
     $('#part_numb').val(partnumb);
     $('#ukuran').val(uk);
     $('#uom').val(uom);
-    $('#hrg_sat').val(hrg_sat);
+    $('#hrg_sat').val(hrg_sat_x);
     $('#modInv').modal('hide');
 });
 
@@ -556,7 +548,7 @@ $('#stInvKoreksiSo').DataTable({
         data: 'action',
         name: 'action',
         orderable: false, 
-        searchable: false
+        searchable: true
     }
   ],
 });
@@ -600,7 +592,7 @@ $('#stInvKoreksiSo_x').DataTable({
         data: 'action',
         name: 'action',
         orderable: false, 
-        searchable: false
+        searchable: true
     }
   ],
 });

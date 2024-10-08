@@ -23,6 +23,7 @@ class ProcessQty extends Model
     protected $fillable = [
         'kd_brg',
         'qty',
+        'nilai',
         'lock_pb'
     ];
     

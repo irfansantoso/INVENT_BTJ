@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProcessGlobalController;
+use App\Http\Controllers\ProcessQtyController;
 use App\Models\TrHeaderPemakaianBbm;
 use App\Models\TrDetailPemBbm;
 use App\Models\StInvent;
@@ -55,7 +57,7 @@ class PemakaianBbmController extends Controller
 
         $jsonz = json_decode($getLastNo, true);
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_ref'], 4, 5);
+            $nourut = substr($jsonz[0]['no_ref'], 4, 4);
             $nourut++;
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo2;
@@ -70,6 +72,14 @@ class PemakaianBbmController extends Controller
         $headerPemakaianBbm =  TrHeaderPemakaianBbm::all();
         $lokasi = Lokasi::all();
         $fixAsset = FixedAsset::all(); 
+
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
 
         $data['title'] = 'Header Pemakaian BBM';
         return view('transaction/pengeluaran_bbm/trHeaderPemakaianBbm', $data, compact('headerPemakaianBbm','lokasi','fixAsset'));
@@ -126,7 +136,11 @@ class PemakaianBbmController extends Controller
             'user_created' => Auth::user()->name
         ]);
         $trHeaderPemakaianBbm->save();
-        return redirect()->route('trHeaderPemakaianBbm')->with('success', 'Tambah data sukses!');
+        $getIdHead = DB::table('tr_header_pemakaian_bbm')
+                        ->select('*')->where('no_ref',$request->no_ref)
+                        ->get();
+        $jdIdHead = json_decode($getIdHead, true);
+        return redirect()->route('trDetailPemBbm',$jdIdHead[0]['id'])->with('success', 'Tambah data header sukses!');
     }
 
     public function trHeaderPemakaianBbmDestroy_del(Request $request)
@@ -158,21 +172,23 @@ class PemakaianBbmController extends Controller
         // $fixedAsset = FixedAsset::all();
         $fixedAsset = FixedAsset::where('kode_fa','=',$getHeaderPemBbm->no_bpm)
                                 ->get(['kode_fa','nama_fa']);
+        $gjam = GabJnsAlatMerk::where('kode_jnsAlatMerk','=','MP991')
+                                ->get(['kode_jnsAlatMerk','keterangan']);                                
         $stsPemakaian = StsPemakaian::all();    
         $stInvent = StInvent::all();
         $getDetailPbbm = TrDetailPemBbm::leftJoin('tr_invent_stock as tris', 'tris.kd_brg','=','tr_detail_pem_bbm.kd_brg')
-                                    ->leftJoin('mstr_jns_alat as mja', 'mja.kode_jnsAlat','=','tr_detail_pem_bbm.jns_alat')
+                                    ->leftJoin('mstr_jnsalat_merk as mjam', 'mjam.kode_jnsAlatMerk','=','tr_detail_pem_bbm.jns_alat')
                                     ->leftJoin('mstr_fixed_asset as mfa', 'mfa.kode_fa','=','tr_detail_pem_bbm.kd_fa')
                                     ->leftJoin('mstr_sts_pemakaian as msp', 'msp.kode','=','tr_detail_pem_bbm.sts_pakai')
                                     ->leftJoin('mstr_lokasi as ml', 'ml.kode_lokasi','=','tr_detail_pem_bbm.kode_lokasi')
                                     ->leftJoin('mstr_aktivitas as ma', 'ma.kode_akv','=','tr_detail_pem_bbm.kode_akv')                                
-                                    ->where('tr_detail_pem_bbm.id','=',$id_head_p_bbm)
+                                    ->where('tr_detail_pem_bbm.id_head_p_bbm','=',$id_head_p_bbm)
                                     ->where('tr_detail_pem_bbm.kode_periode',$jsonx[0]['kode_periode'])
-                                    ->get(['tr_detail_pem_bbm.*','tris.kd_brg as kdbrg','tris.part_numb as part_numb','tris.ukuran as ukuran','mja.nama_jnsAlat as nmJnsAlat','mfa.kode_fa as kdfa','mfa.nama_fa as nmfa','msp.kode as kdsp','msp.keterangan as ketsp','ml.kode_lokasi as kdlok','ml.nama_lokasi as nmlok','ma.kode_akv as kdakv','ma.nama_akv as nmakv']);
+                                    ->get(['tr_detail_pem_bbm.*','tris.kd_brg as kdbrg','tris.part_numb as part_numb','tris.ukuran as ukuran','mjam.keterangan as nmJnsAlat','mfa.kode_fa as kdfa','mfa.nama_fa as nmfa','msp.kode as kdsp','msp.keterangan as ketsp','ml.kode_lokasi as kdlok','ml.nama_lokasi as nmlok','ma.kode_akv as kdakv','ma.nama_akv as nmakv']);
  
         $data['title'] = 'Detail Pemakaian BBM';
         $lokasi = Lokasi::all();
-        $gjam = GabJnsAlatMerk::all();
+        // $gjam = GabJnsAlatMerk::all();
         $aktivAlat = AktivitasAlat::all();
         return view('transaction/pengeluaran_bbm/trDetailPemBbm', $data, compact('getHeaderPemBbm','fixedAsset','stsPemakaian','stInvent','getDetailPbbm','lokasi','gjam','aktivAlat'));
         
@@ -181,7 +197,7 @@ class PemakaianBbmController extends Controller
     public function trDetailPemBbm_add(Request $request)
     {
         // dd($request);
-        // echo($request->tgl_det_p_bbm);
+        // echo($request->hrg_beli);
         // exit();
         $getNPO = DB::table('periode_operasional')
                         ->select('*')->where('status_periode','1')
@@ -195,6 +211,9 @@ class PemakaianBbmController extends Controller
 
         $request->validate([
             'kd_brg' => 'required',
+            'jumQty' => 'required',
+            'hrg_beli' => 'required',
+            'kode_sp' => 'required'
         ]);
 
         // $year = date('Y', strtotime($request->tgl_det_p_bbm));
@@ -230,8 +249,53 @@ class PemakaianBbmController extends Controller
             // return redirect('/');
         }else{
             $trDetailPemBbm->save();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return redirect()->route('trDetailPemBbm',[$request->id_head_p_bbm])->with('success', 'Tambah data sukses!');
         }
+    }
+
+    public function trDetailPemBbm_edit(Request $request)
+    {
+        $getNPO = DB::table('periode_operasional')
+                        ->select('*')->where('status_periode','1')
+                        ->get();
+        $jsonx = json_decode($getNPO, true);
+
+        if($request->tgl_det_p_bbm < $jsonx[0]['awal_tgl'] || $request->tgl_det_p_bbm > $jsonx[0]['akhir_tgl'])
+        {
+           return redirect()->route('trDetailPemBbm')->with('error', 'Tanggal tidak sesuai dengan tahun periode yang dipilih!'); 
+        }
+
+        trDetailPemBbm::where('id', $request->id)
+                  ->update([
+                            'sts_pakai' => $request->kode_sp,
+                            'tgl_det_p_bbm' => $request->tgl_det_p_bbm,
+                            'hmkm_awal' => $request->hmkm_awal,
+                            'hmkm_akhir' => $request->hmkm_akhir,
+                            'krj_alat' => $request->krj_alat,
+                            'rata_rata' => $request->rata_rata,
+                            'kode_lokasi' => $request->kode_lokasi,
+                            'kode_akv' => $request->kode_akv,
+                            'keterangan' => $request->keterangan,
+                            'user_created' => Auth::user()->name,
+                            'updated_at' => date('Y-m-d H:i:s'),
+                            ]);
+
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
+        return back()->with('success',' Ubah data successfully');
+
     }
 
     public function trDetailPemBbm_del(Request $request)
@@ -242,6 +306,13 @@ class PemakaianBbmController extends Controller
             return back()->with('error',' Failed, data tidak ada!');
         }else{
             TrDetailPemBbm::find($request->del_id)->delete();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return back()->with('success',' Data deleted successfully');
         }
 
@@ -250,8 +321,8 @@ class PemakaianBbmController extends Controller
     public function stInvBbm_data(Request $request)
     {
         // $data = StInvent::query();
-      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty, mstr_jnsalat_merk.keterangan as ket FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
-          LEFT JOIN mstr_jnsalat_merk ON tr_invent_stock.kel_brg = mstr_jnsalat_merk.kode_jnsAlatMerk WHERE tr_invent_stock.kel_brg = 'MP991') as tis"));
+      $data = DB::table(DB::raw("(SELECT DISTINCT tr_invent_stock.*,CAST(temp_qty.qty AS DECIMAL(10,2)) as qty,CAST(temp_qty.nilai AS DECIMAL(14,2)) as nilai, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_beli FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
+          LEFT JOIN mstr_jnsalat_merk ON tr_invent_stock.kel_brg = mstr_jnsalat_merk.kode_jnsAlatMerk LEFT JOIN tr_detail_saldo_awal ON tr_invent_stock.kd_brg = tr_detail_saldo_awal.kd_brg WHERE tr_invent_stock.kel_brg = 'MP991') as tis"));
       // $data = StInvent::leftJoin('temp_qty as tq', 'tq.kd_brg','=','tr_invent_stock.kd_brg')
       //                               ->get(['tr_invent_stock.*','tq.qty as qty']);
 
@@ -268,6 +339,9 @@ class PemakaianBbmController extends Controller
                                         data-uom="'.$data->uom.'"
                                         data-merk="'.$data->merk.'"
                                         data-ket="'.$data->ket.'"
+                                        data-qty="'.$data->qty.'"
+                                        data-nilai="'.$data->nilai.'"
+                                        data-hrg_beli="'.$data->hrg_beli.'"
                                 class="btn btn-primary btn-sm clickInv" title="pilih">PILIH</a>';
                     return $btn;
                 })

@@ -36,6 +36,11 @@ class Helper {
      
     }
 
+    public static function bulan(){
+        $bulan=array("Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember");
+        return $bulan;
+    }
+
     public static function convertBulan($mm){
             switch ($mm) {
                 case 1 : $bulan="Januari";break;
@@ -52,6 +57,13 @@ class Helper {
                 case 12 : $bulan="Desember";break;
             }
             return $bulan;  
+    }
+
+    public static function countKdBrg($kdBrg)
+    {
+
+        return DB::table('tr_detail_pem_sp_bbm')->where('kd_brg', $kdBrg)
+                                                ->count();
     }
 
 }

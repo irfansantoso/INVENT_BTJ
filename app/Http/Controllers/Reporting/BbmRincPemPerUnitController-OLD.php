@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Http\Controllers\Reporting;
+
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProcessGlobalController;
+use App\Http\Controllers\ProcessQtyController;
+use App\Helpers\Helper;
+use App\Exports\ExportBbmRincPemPerUnit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use Session;
+
+class BbmRincPemPerUnitController extends Controller
+{
+    public function bbmRincPemPerUnit(Request $request)
+    {
+        $bulan = Helper::bulan();
+        $data['title'] = 'BBM Rincian Pemakaian Per Unit';
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
+        return view('reporting/rpt_bbmRincPemPerUnit', $data,compact('bulan'));
+    }
+
+    public function bbmRincPemPerUnit_rpt(Request $request)
+    {   
+ 
+        $bln = $request->bulan;
+        $thn = $request->tahun;
+
+        $year = substr($thn,2,2);
+        $month = str_pad($bln, 2, "0", STR_PAD_LEFT);
+        $gabYm = $year.$month;        
+
+        // $getSumNilai = DB::select(DB::raw("SELECT a.tgl_det_p_spbbm as tgl,
+        //                                             a.kd_fa as nodoc,
+        //                                             a.kd_brg as kdbrg,
+        //                                             b.part_numb as nmbrg,
+        //                                             b.ukuran as ukur,
+        //                                             a.qty as quantity,
+        //                                             a.uom as satuan,
+        //                                             a.hrg_beli as nilai,
+        //                                             a.kd_sts as sts,
+        //                                             c.keterangan as pemakaian,
+        //                                             0 as hkawal,
+        //                                             0 as hkakhir,
+        //                                             0 as jamkrj,
+        //                                             0 as rata2,
+        //                                             NULL as kdlok,
+        //                                             NULL as nmlok,
+        //                                             NULL as kdactiv,
+        //                                             NULL as activalat,
+        //                                             a.keterangan as ket 
+        //                                 FROM tr_detail_pem_sp_bbm a 
+        //                                 LEFT JOIN tr_invent_stock b ON b.kd_brg = a.kd_brg
+        //                                 LEFT JOIN mstr_sts_pemakaian c ON c.kode = a.kd_sts
+        //                                 WHERE a.kode_periode = $gabYm and b.kel_brg in ('MP991')"));
+        // $getSumNilai = DB::select(DB::raw("SELECT a.tgl_det_p_bbm as tgl,
+        //                                             a.kd_fa as nodoc,
+        //                                             f.nama_fa as nmfa,
+        //                                             a.kd_brg as kdbrg,
+        //                                             b.part_numb as nmbrg,
+        //                                             b.ukuran as ukur,
+        //                                             a.jumlah as quantity,
+        //                                             a.uom as satuan,
+        //                                             a.hrg_beli as nilai,
+        //                                             a.sts_pakai as sts,
+        //                                             c.keterangan as pemakaian,
+        //                                             a.hmkm_awal as hkawal,
+        //                                             a.hmkm_akhir as hkakhir,
+        //                                             (a.hmkm_akhir - a.hmkm_awal) as jamkrj,
+        //                                             (a.jumlah / (a.hmkm_akhir - a.hmkm_awal)) as rata2,
+        //                                             a.kode_lokasi as kdlok,
+        //                                             d.nama_lokasi as nmlok,
+        //                                             a.kode_akv as kdactiv,
+        //                                             e.nama_akv as activalat,
+        //                                             a.keterangan as ket 
+        //                                 FROM tr_detail_pem_bbm a 
+        //                                 LEFT JOIN tr_invent_stock b ON b.kd_brg = a.kd_brg
+        //                                 LEFT JOIN mstr_sts_pemakaian c ON c.kode = a.sts_pakai
+        //                                 LEFT JOIN mstr_lokasi d ON d.kode_lokasi = a.kode_lokasi
+        //                                 LEFT JOIN mstr_aktivitas e ON e.kode_akv = a.kode_akv
+        //                                 LEFT JOIN mstr_fixed_asset f ON f.kode_fa = a.kd_fa
+        //                                 WHERE a.kode_periode = $gabYm and b.kel_brg in ('MP991')"));
+
+        $getSumNilai = DB::select(DB::raw("SELECT
+                                        a.tgl_det_p_spbbm as tgl,
+                                        a.kd_fa as nodoc,
+                                        d.nama_fa as nmfa,
+                                        a.kd_brg as kdbrg,
+                                        b.part_numb as nmbrg,
+                                        b.ukuran as ukur,
+                                        a.qty as quantity,
+                                        a.uom as satuan,
+                                        a.hrg_beli as nilai,
+                                        a.kd_sts as sts,
+                                        c.keterangan as pemakaian,
+                                        0 as hkawal,
+                                        0 as hkakhir,
+                                        0 as jamkrj,
+                                        0 as rata2,
+                                        NULL as kdlok,
+                                        NULL as nmlok,
+                                        NULL as kdactiv,
+                                        NULL as activalat,
+                                        a.keterangan as ket 
+                                    FROM tr_detail_pem_sp_bbm a 
+                                    LEFT JOIN tr_invent_stock b ON b.kd_brg = a.kd_brg
+                                    LEFT JOIN mstr_sts_pemakaian c ON c.kode = a.kd_sts
+                                    LEFT JOIN mstr_fixed_asset d ON d.kode_fa = a.kd_fa
+                                    WHERE a.kode_periode = $gabYm and b.kel_brg in ('MP991')
+                                    
+                                    UNION
+                                    
+                                    SELECT
+                                        a.tgl_det_p_bbm as tgl,
+                                        a.kd_fa as nodoc,
+                                        f.nama_fa as nmfa,
+                                        a.kd_brg as kdbrg,
+                                        b.part_numb as nmbrg,
+                                        b.ukuran as ukur,
+                                        a.jumlah as quantity,
+                                        a.uom as satuan,
+                                        (a.hrg_beli * a.jumlah) as nilai,
+                                        a.sts_pakai as sts,
+                                        c.keterangan as pemakaian,
+                                        a.hmkm_awal as hkawal,
+                                        a.hmkm_akhir as hkakhir,
+                                        (a.hmkm_akhir - a.hmkm_awal) as jamkrj,
+                                        (a.jumlah / (a.hmkm_akhir - a.hmkm_awal)) as rata2,
+                                        a.kode_lokasi as kdlok,
+                                        d.nama_lokasi as nmlok,
+                                        a.kode_akv as kdactiv,
+                                        e.nama_akv as activalat,
+                                        a.keterangan as ket 
+                                    FROM tr_detail_pem_bbm a 
+                                    LEFT JOIN tr_invent_stock b ON b.kd_brg = a.kd_brg
+                                    LEFT JOIN mstr_sts_pemakaian c ON c.kode = a.sts_pakai
+                                    LEFT JOIN mstr_lokasi d ON d.kode_lokasi = a.kode_lokasi
+                                    LEFT JOIN mstr_aktivitas e ON e.kode_akv = a.kode_akv
+                                    LEFT JOIN mstr_fixed_asset f ON f.kode_fa = a.kd_fa
+                                    WHERE a.kode_periode = $gabYm and b.kel_brg in ('MP991')"));
+
+        $array = json_decode(json_encode($getSumNilai), true);
+
+        $fileNm = "BBM-Rincian-Pemakaian-Per-Unit-".$bln."_".$thn.".xlsx";
+        return Excel::download(new ExportBbmRincPemPerUnit($bln,$thn,$array), $fileNm);
+        
+    }
+
+}

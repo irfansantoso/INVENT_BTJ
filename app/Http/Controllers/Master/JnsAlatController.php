@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\JnsAlat;
 use App\Models\Merk;
 use App\Models\GabJnsAlatMerk;
+use App\Models\GabJnsAlatMerk2;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +25,10 @@ class JnsAlatController extends Controller
         $jnsAlat =  JnsAlat::all();
         $merk =  Merk::all();
         $gabJnsAlatMerk = GabJnsAlatMerk::all();
+        $gabJnsAlatMerk2 = GabJnsAlatMerk2::all();
 
         $data['title'] = 'Jenis Alat & Merk';
-        return view('master/jnsalat_merk/jnsAlat', $data, compact('jnsAlat','merk','gabJnsAlatMerk'));
+        return view('master/jnsalat_merk/jnsAlat', $data, compact('jnsAlat','merk','gabJnsAlatMerk','gabJnsAlatMerk2'));
     }
 
     public function jnsAlat_tambah()
@@ -74,6 +76,17 @@ class JnsAlatController extends Controller
                 'keterangan' => $request->keterangan,
             ]);
             $gabJnsAlatMerk->save();
+        }elseif($request->jenisInput=='gab_jnsalat_merk_2'){
+            $request->validate([
+                'kode_jnsAlatMerk' => 'required|unique:mstr_jnsalat_merk_2',
+                'keterangan' => 'required',
+            ]);
+
+            $gabJnsAlatMerk2 = new GabJnsAlatMerk2([
+                'kode_jnsAlatMerk' => $request->kode_jnsAlatMerk,
+                'keterangan' => $request->keterangan,
+            ]);
+            $gabJnsAlatMerk2->save();
         }
 
         return redirect()->route('jnsAlat_tambah')->with('success', 'Tambah data sukses!');

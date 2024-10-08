@@ -43,7 +43,7 @@
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Tanggal</label>
-                  <input type="text" class="form-control" name="tgl_p_sp_bbm" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
+                  <input type="text" class="form-control" name="tgl_p_sp_bbm" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask value="{{ old('tgl_p_sp_bbm') }}">                
               </div>
             </div>
           </div>
@@ -162,7 +162,7 @@ $('#trHeaderPemakaianSpBbm').DataTable({
         data: 'action',
         name: 'action',
         orderable: false, 
-        searchable: false
+        searchable: true
     }
   ],
 });

@@ -129,6 +129,27 @@
     90% {margin-top: 0;}
     100% {margin-top: 0;}
   }
+
+  /* Animation spin/zoom in out for main menu in menu.blade.php*/
+  /*.spinner:hover .spinner_act{
+      animation: spin 1s infinite linear;
+  }*/
+
+  /*@keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }*/
+  .zoominout:hover .zoominout_act{
+      animation: zoomInOut 2s infinite alternate;
+  }
+  @keyframes zoomInOut {
+      0% {
+          transform: scale(1); /* Zoom in starting point */
+      }
+      100% {
+          transform: scale(1.5); /* Zoom out ending point */
+      }
+  }
    
   </style>
 
@@ -291,7 +312,14 @@
       "autoWidth": false,
       "order": [],
       "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-    }).buttons().container().appendTo('#example4_wrapper .col-md-6:eq(0)');    
+    }).buttons().container().appendTo('#example4_wrapper .col-md-6:eq(0)'); 
+    $("#example5").DataTable({
+      "responsive": true, 
+      "lengthChange": false, 
+      "autoWidth": false,
+      "order": [],
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example5_wrapper .col-md-6:eq(0)');   
 
     $("#rptLogLoc").DataTable({
       "responsive": true, 
@@ -301,217 +329,7 @@
       "buttons": []
     }).buttons().container().appendTo('#rptLogLoc_wrapper .col-md-6:eq(0)');
 
-    $('#trHeaderLm').DataTable({
-        responsive: true,
-        processing: true,
-        serverSide: true,
-        ajax: '{!! route('trHeaderTpnLm.data') !!}', // memanggil route yang menampilkan data json
-        columns: 
-        [
-            { // mengambil & menampilkan kolom sesuai tabel database
-                data: 'no_tpn',
-                name: 'no_tpn'
-            },
-            {
-                data: 'tgl_input_tpn',
-                name: 'tgl_input_tpn'
-            },
-            {
-                data: 'thn_produksi_tpn',
-                name: 'thn_produksi_tpn'
-            },
-            {
-                data: 'lokasi_tpn',
-                name: 'lokasi_tpn'
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false, 
-                searchable: false
-            }
-        ],
-        
-
-        // "dom": '<"html5buttons"l>BTfgt<"row"<"col-md-6"i><"col-md-6"p>>',
-        //         buttons: [
-        //             {extend: 'copy'},
-        //             {extend: 'csv'},
-        //             {extend: 'excelHtml5', title: 'ExampleFile', class: "buttonExcel"},
-        //             {extend: 'pdf', title: 'ExampleFile'}
-        //         ]
-
-    });
-
-    $('#trHeaderLmOut').DataTable({
-        responsive: true,
-        processing: true,
-        serverSide: true,
-        ajax: '{!! route('trHeaderTpnLmOut.data') !!}', // memanggil route yang menampilkan data json
-        columns: 
-        [
-            { // mengambil & menampilkan kolom sesuai tabel database
-                data: 'no_tpn_out',
-                name: 'no_tpn_out'
-            },
-            {
-                data: 'tgl_input_tpn_out',
-                name: 'tgl_input_tpn_out'
-            },
-            {
-                data: 'trip',
-                name: 'trip'
-            },
-            {
-                data: 'nama_lokasi',
-                name: 'nama_lokasi'
-            },
-            {
-                data: 'md',
-                name: 'md'
-            },
-            {
-                data: 'mua',
-                name: 'mua'
-            },
-            {
-                data: 'mdb',
-                name: 'mdb'
-            },
-            {
-                data: 'muab',
-                name: 'muab'
-            },
-            {
-                data: 'mda',
-                name: 'mda'
-            },
-            {
-                data: 'muaa',
-                name: 'muaa'
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false, 
-                searchable: false
-            }
-        ],
-        
-    });    
-
-    $('#trLoglistModal').DataTable({
-        responsive: true,
-        processing: true,
-        serverSide: true,
-        order: [],
-        // ajax: '{{ url("trLoglistModal")}}',
-        ajax: '{!! route('trLoglistModal.data') !!}', // memanggil route yang menampilkan data json
-        columns: 
-        [
-            { // mengambil & menampilkan kolom sesuai tabel database
-                data: 'nolog',
-                name: 'nolog'
-            },
-            {
-                data: 'tpt',
-                name: 'tpt'
-            },
-            {
-                data: 'trk',
-                name: 'trk'
-            },
-            {
-                data: 'nk',
-                name: 'nk'
-            },
-            {
-                data: 'ptk',
-                name: 'ptk'
-            },
-            {
-                data: 'nobt',
-                name: 'nobt'
-            },
-            {
-                data: 'pj',
-                name: 'pj'
-            },
-            {
-                data: 'uj',
-                name: 'uj'
-            },
-            {
-                data: 'pk',
-                name: 'pk'
-            },
-            {
-                data: 'rt',
-                name: 'rt'
-            },
-            {
-                data: 'vl',
-                name: 'vl'
-            },
-            {
-                data: 'ct',
-                name: 'ct'
-            },
-            {
-                data: 'pc',
-                name: 'pc'
-            }
-        ],
-        
-    });
-
-    $('#trHistory').DataTable({
-        responsive: true,
-        processing: true,
-        serverSide: true,
-        bLengthChange: false,
-        order: [],
-        ajax: '{!! route('trHistory.data') !!}', // memanggil route yang menampilkan data json
-        dom: 'Blfrtip',
-        buttons: [
-             {
-                 extend: 'pdf',
-                 exportOptions: {
-                     columns: [0,1,2] // Column index which needs to export
-                 }
-             },
-             {
-                 extend: 'csv',
-                 exportOptions: {
-                     columns: [0,1,2] // Column index which needs to export
-                 }
-             },
-             {
-                 extend: 'excel',
-             },
-             {
-                  text: 'Reload',
-                  action: function ( e, dt, node, config ) {
-                      dt.ajax.reload();
-                  }
-              }
-        ],
-        columns: 
-        [
-            { // mengambil & menampilkan kolom sesuai tabel database
-                data: 'no_tpn',
-                name: 'no_tpn'
-            },
-            {
-                data: 'no_btg',
-                name: 'no_btg'
-            },
-            {
-                data: 'nama_lokasi',
-                name: 'nama_lokasi'
-            },
-        ],
-    });
+    
     
     $('#example2').DataTable({
       "paging": true,
@@ -530,146 +348,17 @@
     $('#datemask2').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' })
     //Money Euro
     $('[data-mask]').inputmask()
-
-    $(document).on('click', '.delete-confirm', function() {
-        let id = $(this).attr('data-id');
-        let notpn = $(this).attr('data-kode');
-        $('#id-destroy').val(id);
-        $('#id-destroy2').html(notpn);
-        $('#notpn_del').val(notpn);
-    });
-
-    $(document).on('click', '.del-conf-det-tpn', function() {
-        let id = $(this).attr('data-id');
-        let nobtg = $(this).attr('data-nobtg');
-        let fromlok = $(this).attr('data-fromlok');
-        let tolok = $(this).attr('data-tolok');
-        $('#id-destroy').val(nobtg);
-        $('#id-destroy2').html(nobtg);
-        $('#from-lok').val(fromlok);
-        $('#to-lok').val(tolok);
-    });
-
-    $(document).on('click', '.edit-form', function() {
-        let id = $(this).attr('data-id');
-        let thnrkt = $(this).attr('data-thnrkt');
-        let nobtg = $(this).attr('data-kode');
-        let tglukur = $(this).attr('data-tglukur');
-        let ky = $(this).attr('data-ky');
-        let kc = $(this).attr('data-kc');
-        let kd = $(this).attr('data-kd');
-        let kk = $(this).attr('data-kk');
-        let dt_pjg = $(this).attr('data-pjg');
-        let dt_pkl = $(this).attr('data-pkl');
-        let dt_ujg = $(this).attr('data-ujg');
-        let dt_rt2 = $(this).attr('data-rt2');
-        let dt_cct = $(this).attr('data-cct');
-        let dt_pcct = $(this).attr('data-pcct');
-        let dt_vol = $(this).attr('data-vol');
-        let dt_petak = $(this).attr('data-petak');
-        let dt_kelas = $(this).attr('data-kelas');
-        let dt_timbul = $(this).attr('data-timbul');
-        $('#id-tpndetin').val(id);
-        $('#thnrkt').val(thnrkt);
-        $('#nobtg').val(nobtg);
-        $('#tglukur').val(tglukur);
-        $("#jns_kayu_m").val(ky).trigger('change');
-        $("#kode_chainsaw_m").val(kc).trigger('change');
-        $("#kode_driver_m").val(kd).trigger('change');
-        $("#kode_kupas_m").val(kk).trigger('change');
-        $('.dt_pjg').val(dt_pjg); //ini pakai class karena ID sudah terpakai
-        $('.dt_pkl').val(dt_pkl);
-        $('.dt_ujg').val(dt_ujg);
-        $('.dt_rt2').val(dt_rt2);
-        $('.dt_cct').val(dt_cct);
-        $('.dt_pcct').val(dt_pcct);
-        $('.dt_vol').val(dt_vol);
-        $('.dt_petak').val(dt_petak);
-        $('.dt_kelas').val(dt_kelas);
-        $('#dt_timbul').val(dt_timbul).trigger('change');
-    });
+    
 
     window.setTimeout(function() {
       $(".alert").fadeTo(500, 0).slideUp(500, function(){
         $(this).remove(); 
       });
-    }, 10000);
+    }, 10000);      
 
-    $(function () {
-      $("#pjg , #pkl, #ujg, #cct").keyup(function () {
-        var pjg = parseFloat($("#pjg").val() || 0);
-        var pkl = parseInt($("#pkl").val() || 0);
-        var ujg = parseInt($("#ujg").val() || 0);
-        var cct = parseInt($("#cct").val() || 0);
-        var rata = parseInt((pkl + ujg) / 2);
-        var pcct = parseFloat((1.273 * cct * cct * 1 / rata / rata * 100) || 0);
-        var pcct2 = parseFloat(1.273 * cct * cct * 1 / rata / rata * 100)/100;
-        var pcct3 = pcct2.toFixed(3);
-        var vol3 = parseFloat(((0.7854 * rata * rata * pjg) / 10000 - 0.7854 * rata * rata * pjg / 10000 * pcct3) || 0);
-        var kls = "";
-        if (rata<50){
-          kls = "40-49";
-        }else if(rata<60){
-          kls = "50-59";
-        }else{
-          kls = "60 Up";
-        }
-        
-        $("#cct").val(cct);
-        $("#rt2").val(rata);
-        $("#pcct").val(pcct.toFixed(1));
-        $("#vol").val(vol3.toFixed(2));
-        $("#kelas").val(kls);
-      });
-    });
-
-    $("body").on('keyup', "#pjg-m , #pkl-m, #ujg-m, #cct-m", function() {
-        var pjg = parseFloat($("#pjg-m").val() || 0);
-        var pkl = parseInt($("#pkl-m").val() || 0);
-        var ujg = parseInt($("#ujg-m").val() || 0);
-        var cct = parseInt($("#cct-m").val() || 0);
-        var rata = parseInt((pkl + ujg) / 2);
-        var pcct = parseFloat(1.273 * cct * cct * 1 / rata / rata * 100);
-        var pcct2 = parseFloat(1.273 * cct * cct * 1 / rata / rata * 100)/100;
-        var pcct3 = pcct2.toFixed(3);
-        var vol3 = (0.7854 * rata * rata * pjg) / 10000 - 0.7854 * rata * rata * pjg / 10000 * pcct3;
-        var kls = "";
-        if (rata<50){
-          kls = "40-49";
-        }else if(rata<60){
-          kls = "50-59";
-        }else{
-          kls = "60 Up";
-        }
-        
-        $("#rt2-m").val(rata);
-        $("#pcct-m").val(pcct.toFixed(1));
-        $("#vol-m").val(vol3.toFixed(2));
-        $("#kelas-m").val(kls);
-    }); 
-
-    $(function () {
-      $("#no_btg").keyup(function () {
-        var nobtgx = $("#no_btg").val();        
-        $("#nobtgx").val(nobtgx);
-      });
-    });
 
     //Date range picker
     $('#reservation').daterangepicker()
-
-    // untuk autofocus kursor diakhir text pada textbox
-    // $(document).ready(function() {  
-    //   var input = $("#no_tpn");
-    //   var len = input.val().length;
-    //   input[0].focus();
-    //   input[0].setSelectionRange(len, len);
-    // });
-
-    // document.getElementById('no_tpn').addEventListener('keyup', e => {
-    //   const copyTextInput = document.getElementById('kd_tpn');
-    //   copyTextInput.value = e.target.value;
-    // });
 
   });
 </script>

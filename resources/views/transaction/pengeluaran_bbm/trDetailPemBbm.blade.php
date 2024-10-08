@@ -87,8 +87,7 @@
             <div class="col-sm-5">
               <div class="form-group">
                 <label>Jenis Alat/Unit</label>
-                  <select class="form-control select2" name="jns_alat" id="jns_alat" style="width: 100%;">
-                    <option value="" selected="selected">-- Lokasi --</option>
+                  <select class="form-control" name="jns_alat" id="jns_alat" style="width: 100%;">
                     @foreach ($gjam as $ja)
                       <option value="{{ $ja->kode_jnsAlatMerk }}">{{ $ja->keterangan }}</option>
                     @endforeach
@@ -110,7 +109,7 @@
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Harga Beli</label>
-                  <input type="text" class="form-control" id="hrg_beli" name="hrg_beli" readonly>
+                  <input type="number" class="form-control" id="hrg_beli" name="hrg_beli" readonly>
               </div>
             </div>                      
           </div>
@@ -118,7 +117,7 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Kode F/A</label>                  
-                  <select class="form-control select2" name="kd_fa" id="kd_fa" style="width: 100%;">
+                  <select class="form-control" name="kd_fa" id="kd_fa" style="width: 100%;">
                     @foreach ($fixedAsset as $fa)
                       <option value="{{ $fa->kode_fa }}">{{ $fa->kode_fa }} - {{ $fa->nama_fa }}</option>
                     @endforeach
@@ -196,7 +195,7 @@
               </div>
             </div>
         <!-- /.card-body -->
-        </div>
+          </div>
 
         <div class="card-footer">
           <button class="btn btn-success">Simpan</button>
@@ -214,16 +213,16 @@
           <tr>
             <th>Kd Brg</th>
             <th>Nama Brg</th>
+            <th>Tanggal</th>
+            <th>HMKM Awal</th>
+            <th>HMKM Akhir</th>
             <th>Ukuran/PartNo</th>
             <th>Jenis Alat</th>
             <th>Jumlah</th>
             <th>Satuan</th>
             <th>Harga Beli</th>
             <th>Kode F/A</th>
-            <th>Status Pemakaian</th>
-            <th>Tanggal</th>
-            <th>HMKM Awal</th>
-            <th>HMKM Akhir</th>
+            <th>Status Pemakaian</th>            
             <th>Kerja Alat</th>
             <th>Rata-rata</th>
             <th>Lokasi Aktivitas</th>
@@ -237,16 +236,16 @@
             <tr>              
                 <td>{{ $gdpb->kdbrg }}</td>
                 <td>{{ $gdpb->part_numb }}</td>
+                <td>{{ $gdpb->tgl_det_p_bbm }}</td>
+                <td>{{ $gdpb->hmkm_awal }}</td>
+                <td>{{ $gdpb->hmkm_akhir }}</td>
                 <td>{{ $gdpb->ukuran }}</td>
                 <td>{{ $gdpb->nmJnsAlat }}</td>
                 <td>{{ $gdpb->jumlah }}</td>
                 <td>{{ $gdpb->uom }}</td>
-                <td>{{ $gdpb->hrg_beli }}</td>
+                <td>{{ number_format($gdpb->hrg_beli, 2, ',', '.') }}</td>
                 <td>{{ $gdpb->kdfa }} - {{ $gdpb->nmfa }}</td>
-                <td>{{ $gdpb->kdsp }} - {{ $gdpb->ketsp }}</td>
-                <td>{{ $gdpb->tgl_det_p_bbm }}</td>
-                <td>{{ $gdpb->hmkm_awal }}</td>
-                <td>{{ $gdpb->hmkm_akhir }}</td>
+                <td>{{ $gdpb->kdsp }} - {{ $gdpb->ketsp }}</td>                
                 <td>{{ $gdpb->krj_alat }}</td>
                 <td>{{ $gdpb->rata_rata }}</td>
                 <td>{{ $gdpb->kdlok }} - {{ $gdpb->nmlok }}</td>
@@ -255,9 +254,20 @@
                 <td>                
                   <a href="#" data-toggle="modal"
                   data-target="#modalEdit"
-                  data-id="{{ $gdpb->id }}"
-                  class="edit btn btn-primary btn-sm editDetSa" title="Edit"><i class="far fa-edit"></i></a>
-                  <a href="#" data-toggle="modal" data-target="#modal-delete" data-id="{{ $gdpb->id }}" data-kode="{{ $gdpb->kd_brg }}" class="btn btn-danger btn-sm delDetSa" title="Delete"><i class="fa fa-trash"></i></a>
+                  data-id="{{ $gdpb->id }}" 
+                  data-tgl_det_p_bbm="{{ $gdpb->tgl_det_p_bbm }}" 
+                  data-jumQty="{{ $gdpb->jumlah }}"
+                  data-hmkm_awal="{{ $gdpb->hmkm_awal }}" 
+                  data-hmkm_akhir="{{ $gdpb->hmkm_akhir }}" 
+                  data-krj_alat="{{ $gdpb->krj_alat }}" 
+                  data-rata_rata="{{ $gdpb->rata_rata }}" 
+                  data-kdsp="{{ $gdpb->kdsp }}" 
+                  data-ketsp="{{ $gdpb->ketsp }}"
+                  data-kdlok="{{ $gdpb->kdlok }}"
+                  data-kdakv="{{ $gdpb->kdakv }}" 
+                  data-keterangan="{{ $gdpb->keterangan }}" 
+                  class="edit btn btn-primary btn-sm editDetBbm" title="Edit"><i class="far fa-edit"></i></a>
+                  <a href="#" data-toggle="modal" data-target="#modal-delete" data-id="{{ $gdpb->id }}" data-kode="{{ $gdpb->kdbrg }}" class="btn btn-danger btn-sm delDetSa" title="Delete"><i class="fa fa-trash"></i></a>
                 </td>
             </tr>
             @endforeach                     
@@ -267,6 +277,108 @@
       <!-- /.card-body -->
     </div>
     <!-- /.card -->
+
+    <!-- Modal EDiT Show -->
+    <div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="modalEdit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header">Edit Form
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="editForm"></div>           
+                    <form class="form-horizontal" action="{{ route('trDetailPemBbm.edit') }}" method="POST">
+                       @csrf
+                      <input type="hidden" class="form-control" id="idx" name="id">
+                      <input type="hidden" name="id_head_p_bbm" id="id_head_p_bbm_x">
+                      <input type="hidden" class="form-control" id="jumQty_x" name="jumQty">
+                      <div class="card-body">                                  
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>Status Pemakaian</label>
+                                <input type="text" data-toggle="modal" data-target="#modSp_x" class="form-control" id="nama_sp_x" name="sts_pakai" placeholder="klik disini..">
+                                <input type="hidden" id="kode_sp_x" name="kode_sp" readonly>
+                            </div>
+                          </div>            
+                        </div>
+                        <div class="row">            
+                          <div class="col-sm-2">
+                            <div class="form-group">
+                              <label>Tanggal</label>
+                                <input type="text" class="form-control" id="tgl_det_p_bbm_x" name="tgl_det_p_bbm" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>
+                            </div>
+                          </div>
+                          <div class="col-sm-2">
+                            <div class="form-group">
+                              <label>HMKM Awal</label>
+                                <input type="number" class="form-control" id="hmkm_awal_x" name="hmkm_awal">
+                            </div>
+                          </div>
+                          <div class="col-sm-2">
+                            <div class="form-group">
+                              <label>HMKM Akhir</label>
+                                <input type="number" class="form-control" id="hmkm_akhir_x" name="hmkm_akhir">
+                            </div>
+                          </div>
+                          <div class="col-sm-2">
+                            <div class="form-group">
+                              <label>Kerja Alat</label>
+                                <input type="number" class="form-control" id="krj_alat_x" name="krj_alat" readonly>
+                            </div>
+                          </div>
+                          <div class="col-sm-2">
+                            <div class="form-group">
+                              <label>Rata2</label>
+                                <input type="number" class="form-control" id="rata_rata_x" name="rata_rata" readonly>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">            
+                          <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>Lokasi Activity</label>
+                                <select class="form-control select2" name="kode_lokasi" id="kode_lokasi_x" style="width: 100%;">
+                                  <option value="" selected="selected">-- Lokasi --</option>
+                                  @foreach ($lokasi as $lk)
+                                    <option value="{{ $lk->kode_lokasi }}">{{ $lk->nama_lokasi }}</option>
+                                  @endforeach
+                                </select>
+                            </div>
+                          </div>
+                          <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>Aktivitas Alat</label>
+                                <select class="form-control select2" name="kode_akv" id="kode_akv_x" style="width: 100%;">
+                                  <option value="" selected="selected">-- Aktivitas Alat --</option>
+                                  @foreach ($aktivAlat as $akal)
+                                    <option value="{{ $akal->kode_akv }}">{{ $akal->nama_akv }}</option>
+                                  @endforeach
+                                </select>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Keterangan</label>
+                                <input type="text" class="form-control" id="keterangan_x" name="keterangan">
+                            </div>
+                          </div>
+                        </div>
+                      <!-- /.card-body -->
+                      </div>  
+
+                      <div class="card-footer">
+                        <button class="btn btn-success">Simpan</button>
+                      </div>
+                      <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal EDiTShow -->
 
     <!-- Modal Invent Stock Show -->
     <div class="modal fade" id="modInv" tabindex="-1" aria-labelledby="modInv" aria-hidden="true">
@@ -377,25 +489,50 @@
             </div>
         </div>
     </div>
-    <!-- END Modal FixedAsset Show -->
+    <!-- END Modal FixedAsset Show -->  
 
-    <!-- Modal EDiT Show -->
-    <div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="modalEdit" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+    <!-- Modal StsPemakaian edit Show -->
+    <div class="modal fade" id="modSp_x" tabindex="-1" aria-labelledby="modSp_x" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 70%;overflow-y: auto;">
             <div class="modal-content">
-                <div class="modal-header">Edit Form
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
                 <div class="modal-body">
-                    <div id="editForm"></div>           
-                    
+                    <div class="card">
+                      <!-- /.card-header -->
+                      <div class="card-body">
+                        <table id="dtStatic" class="table table-bordered table-striped">
+                          <thead>
+                          <tr>
+                            <th>Kode</th>
+                            <th>Keterangan</th>
+                            <th>#</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                            @foreach ($stsPemakaian as $etr)
+                            <tr>              
+                                <td>{{ $etr->kode }}</td>
+                                <td>{{ $etr->keterangan }}</td>
+                                <td><a href="#" data-kode_sp="{{ $etr->kode }}" 
+                                        data-nama_sp="{{ $etr->keterangan }}" 
+                                        class="btn btn-primary btn-sm clickSp_x" title="pilih">PILIH</a></td>
+                            </tr>
+                            @endforeach                     
+                          </tbody>
+                          <tfoot>
+                          <tr>
+                            <th>Kode</th>
+                            <th>Keterangan</th>
+                          </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                      <!-- /.card-body -->
+                    </div>                    
                 </div>
             </div>
         </div>
     </div>
-    <!-- END Modal EDiTShow -->
+    <!-- END Modal FixedAsset Show -->  
 
     <!-- Modal -->
     <div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
@@ -428,30 +565,30 @@
 <script type="text/javascript">
 //$('.select2-basic').select2();
 
-var hrg_beli = document.getElementById("hrg_beli");
-hrg_beli.addEventListener("keyup", function(e) {
-  // tambahkan 'Rp.' pada saat form di ketik
-  // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
-  hrg_beli.value = formatRupiah(this.value, "");
-});
+// var hrg_beli = document.getElementById("hrg_beli");
+// hrg_beli.addEventListener("keyup", function(e) {
+//   // tambahkan 'Rp.' pada saat form di ketik
+//   // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
+//   hrg_beli.value = formatRupiah(this.value, "");
+// });
 
 /* Fungsi formatRupiah */
-function formatRupiah(angka, prefix) {
-  var number_string = angka.replace(/[^,\d]/g, "").toString(),
-    split = number_string.split(","),
-    sisa = split[0].length % 3,
-    hrg_beli = split[0].substr(0, sisa),
-    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+// function formatRupiah(angka, prefix) {
+//   var number_string = angka.replace(/[^,\d]/g, "").toString(),
+//     split = number_string.split(","),
+//     sisa = split[0].length % 3,
+//     hrg_beli = split[0].substr(0, sisa),
+//     ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-  // tambahkan titik jika yang di input sudah menjadi angka ribuan
-  if (ribuan) {
-    separator = sisa ? "." : "";
-    hrg_beli += separator + ribuan.join(".");
-  }
+//   // tambahkan titik jika yang di input sudah menjadi angka ribuan
+//   if (ribuan) {
+//     separator = sisa ? "." : "";
+//     hrg_beli += separator + ribuan.join(".");
+//   }
 
-  hrg_beli = split[1] != undefined ? hrg_beli + "," + split[1] : hrg_beli;
-  return prefix == undefined ? hrg_beli : hrg_beli ? "" + hrg_beli : "";
-}
+//   hrg_beli = split[1] != undefined ? hrg_beli + "," + split[1] : hrg_beli;
+//   return prefix == undefined ? hrg_beli : hrg_beli ? "" + hrg_beli : "";
+// }
 
 $("#dtStatic").DataTable({
   "responsive": true, 
@@ -459,7 +596,7 @@ $("#dtStatic").DataTable({
   "autoWidth": false,
   "order": [],
   "buttons": false
-}).buttons().container().appendTo('#dtStatic_wrapper .col-md-6:eq(0)'); 
+}).buttons().container().appendTo('#dtStatic_wrapper .col-md-6:eq(0)');  
 
 $(document).on('click', '.clickInv', function() {
     var id = $(this).attr('data-id');
@@ -470,6 +607,10 @@ $(document).on('click', '.clickInv', function() {
     var uom = $(this).attr('data-uom');
     var merk = $(this).attr('data-merk');
     var ket = $(this).attr('data-ket');
+    var qty = $(this).attr('data-qty');
+    var nilai = $(this).attr('data-nilai');
+    var hrg_beli = nilai/qty;
+    var hrg_beli_x = parseFloat(hrg_beli.toFixed(4));
     
     $('#id').val(id);
     $('#kd_brg').val(kdbrg);
@@ -479,6 +620,7 @@ $(document).on('click', '.clickInv', function() {
     $('#uom').val(uom);
     $('#merk').val(merk);
     $('#ket').val(ket);
+    $('#hrg_beli').val(hrg_beli_x);
     $('#modInv').modal('hide');
 });
 
@@ -498,6 +640,24 @@ $(document).on('click', '.clickSp', function() {
     $('#kode_sp').val(kode_sp);
     $('#sts_pakai').val(nama_sp);
     $('#modSp').modal('hide');
+});
+
+$(document).on('click', '.clickFa_x', function() {
+    var kode_fa = $(this).attr('data-kode_fa');
+    var nama_fa = $(this).attr('data-nama_fa');
+    
+    $('#kd_fa_x').val(kode_fa);
+    $('#nama_fa_x').val(nama_fa);
+    $('#modFa_x').modal('hide');
+});
+
+$(document).on('click', '.clickSp_x', function() {
+    var kode_sp = $(this).attr('data-kode_sp');
+    var nama_sp = $(this).attr('data-nama_sp');
+    
+    $('#kode_sp_x').val(kode_sp);
+    $('#nama_sp_x').val(nama_sp);
+    $('#modSp_x').modal('hide');
 });
 
 $('#kel_brg').on('change', function (e) { 
@@ -520,9 +680,23 @@ $(function () {
     var hmkm_awal = parseInt($("#hmkm_awal").val() || 0);
     var hmkm_akhir = parseInt($("#hmkm_akhir").val() || 0);
     var krj_alat = parseInt(hmkm_akhir - hmkm_awal);
+    // var krj_alat = parseInt(hmkm_awal - hmkm_akhir);
     var rata2 = parseInt(jumQty / krj_alat);
     $("#krj_alat").val(krj_alat);
     $("#rata_rata").val(rata2);
+  });
+});
+
+$(function () {
+  $("#jumQty_x, #hmkm_awal_x, #hmkm_akhir_x").keyup(function () {
+    var jumQty = parseInt($("#jumQty_x").val() || 0);
+    var hmkm_awal = parseInt($("#hmkm_awal_x").val() || 0);
+    var hmkm_akhir = parseInt($("#hmkm_akhir_x").val() || 0);
+    var krj_alat = parseInt(hmkm_akhir - hmkm_awal);
+    // var krj_alat = parseInt(hmkm_awal - hmkm_akhir);
+    var rata2 = parseInt(jumQty / krj_alat);
+    $("#krj_alat_x").val(krj_alat);
+    $("#rata_rata_x").val(rata2);
   });
 });
 
@@ -589,6 +763,39 @@ $('#stInvBbm').DataTable({
   ],
 });
 
+$(document).on('click', '.editDetBbm', function() {
+        let id = $(this).attr('data-id');
+        let id_head_p_bbm = $(this).attr('data-id_head_p_bbm');
+        let kdsp = $(this).attr('data-kdsp');
+        let stspakai = $(this).attr('data-ketsp');
+        let jumQty = $(this).attr('data-jumQty');
+        let hmkm_awal = $(this).attr('data-hmkm_awal');
+        let hmkm_akhir = $(this).attr('data-hmkm_akhir');
+        let krj_alat = $(this).attr('data-krj_alat');
+        let rata_rata = $(this).attr('data-rata_rata');
+        let kdlok = $(this).attr('data-kdlok');
+        let kdakv = $(this).attr('data-kdakv');
+        let keterangan = $(this).attr('data-keterangan');
+        let tgl_det_p_bbm = $(this).attr('data-tgl_det_p_bbm');
+         // alert(kdlok);
+        
+        $('#idx').val(id);
+        $('#id_head_p_bbm_x').val(id_head_p_bbm);
+        $('#kode_sp_x').val(kdsp);
+        $('#nama_sp_x').val(stspakai);
+        $('#jumQty_x').val(jumQty);
+        $('#hmkm_awal_x').val(hmkm_awal);
+        $('#hmkm_akhir_x').val(hmkm_akhir);
+        $('#krj_alat_x').val(krj_alat);
+        $('#rata_rata_x').val(rata_rata);
+        $("#kode_lokasi_x").val(kdlok).trigger('change');
+        $("#kode_akv_x").val(kdakv).trigger('change');
+        $('#keterangan_x').val(keterangan);
+        $('#tgl_det_p_bbm_x').val(tgl_det_p_bbm);
+        // $("#jns_kayu_m").val(ky).trigger('change');
+                
+    });
+
 // $(document).on('click', '.editDetSa', function() {
 //     let id = $(this).attr('data-id');
 
@@ -600,12 +807,12 @@ $('#stInvBbm').DataTable({
 //     });
 // });
 
-// $(document).on('click', '.delDetSa', function() {
-//     let id = $(this).attr('data-id');
-//     let dakod = $(this).attr('data-kode');
-//     $('#id-destroy').val(id);
-//     $('#dakod').html(dakod);
-//     alert(id);
-// });
+$(document).on('click', '.delDetSa', function() {
+    let id = $(this).attr('data-id');
+    let dakod = $(this).attr('data-kode');
+    $('#id-destroy').val(id);
+    $('#dakod').html(dakod);
+    // alert(id);
+});
 </script> 
 @stop

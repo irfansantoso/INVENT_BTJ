@@ -37,14 +37,14 @@
             </div>
             <div class="col-sm-3">
               <div class="form-group">
-                <label>No SPPB</label>
+                <label>No SPPB / PO</label>
                   <input type="text" class="form-control" id="no_sppb" name="no_sppb" placeholder="" value="{{ App\Http\Controllers\PindahGudangController::getNewNoSppb('0139'); }}">
               </div>
             </div>
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Tanggal Terima</label>
-                  <input type="text" class="form-control" name="tgl_sa" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask>                
+                  <input type="text" class="form-control" name="tgl_sa" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask value="{{ old('tgl_sa') }}">                
               </div>
             </div>
             <div class="col-sm-2">
@@ -120,6 +120,25 @@
       <!-- /.card-body -->
     </div>
     <!-- /.card -->
+
+    <!-- Modal EDiT Show -->
+    <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="modal-edit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header">Edit Form
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="editForm"></div>           
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal EDiTShow -->
+
     <!-- Modal -->
     <div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
         aria-hidden="true">
@@ -188,17 +207,17 @@ $('#trHeaderPindahGudang').DataTable({
         data: 'action',
         name: 'action',
         orderable: false, 
-        searchable: false
+        searchable: true
     }
   ],
 });
 
-$(document).on('click', '.editStInvent', function() {
+$(document).on('click', '.editHeadPinGud', function() {
     let id = $(this).attr('data-id');
 
     $.ajax({
         type: 'GET',
-        url: "{{ URL::to('stInvent/showedit')}}"+"/"+id
+        url: "{{ URL::to('trHeaderPindahGudang/showedit')}}"+"/"+id
     }).done( function( response ) {
         $('#editForm').html(response.html);
     });

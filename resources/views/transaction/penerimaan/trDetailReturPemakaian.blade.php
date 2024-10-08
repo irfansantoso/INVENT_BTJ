@@ -438,7 +438,11 @@ $(document).on('click', '.clickInv', function() {
     var partnumb = $(this).attr('data-partnumb');
     var uk = $(this).attr('data-uk');
     var uom = $(this).attr('data-uom');
-    var hrg_sat = $(this).attr('data-hrg_sat');
+    // var hrg_sat = $(this).attr('data-hrg_sat');
+    var qty_temp = $(this).attr('data-qty');
+    var nilai = $(this).attr('data-nilai');
+    var hrg_sat = nilai/qty_temp;
+    var hrg_sat_x = parseFloat(hrg_sat.toFixed(4));
     // alert(hrg_sat);
     
     $('#id').val(id);
@@ -447,7 +451,7 @@ $(document).on('click', '.clickInv', function() {
     $('#part_numb').val(partnumb);
     $('#ukuran').val(uk);
     $('#uom').val(uom);
-    $('#hrg_sat').val(hrg_sat);
+    $('#hrg_sat').val(hrg_sat_x);
     $('#modInv').modal('hide');
 });
 

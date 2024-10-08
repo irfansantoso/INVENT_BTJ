@@ -111,9 +111,10 @@
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Harga Beli</label>
-                  <input type="text" class="form-control" id="hrg_beli" name="hrg_beli" readonly>
+                  <input type="number" class="form-control" id="hrg_beli" name="hrg_beli" readonly>
               </div>
-            </div>                      
+            </div>
+                                    
           </div>
           <div class="row">
             <div class="col-sm-2">
@@ -131,7 +132,7 @@
             <div class="col-sm-3">
               <div class="form-group">
                 <label>Status Pemakaian</label>
-                  <input type="text" data-toggle="modal" data-target="#modSp" class="form-control" id="nama_sp" name="sts_pakai" placeholder="klik disini.." readonly>
+                  <input type="text" data-toggle="modal" data-target="#modSp" class="form-control" id="nama_sp" name="sts_pakai" placeholder="klik disini.." readonly required>
                   <input type="hidden" class="form-control" id="kode_sp" name="kode_sp">
               </div>
             </div>            
@@ -597,29 +598,29 @@
 //$('.select2-basic').select2();
 
 var hrg_beli = document.getElementById("hrg_beli");
-hrg_beli.addEventListener("keyup", function(e) {
-  // tambahkan 'Rp.' pada saat form di ketik
-  // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
-  hrg_beli.value = formatRupiah(this.value, "");
-});
+// hrg_beli.addEventListener("keyup", function(e) {
+//   // tambahkan 'Rp.' pada saat form di ketik
+//   // gunakan fungsi formatRupiah() untuk mengubah angka yang di ketik menjadi format angka
+//   hrg_beli.value = formatRupiah(this.value, "");
+// });
 
 /* Fungsi formatRupiah */
-function formatRupiah(angka, prefix) {
-  var number_string = angka.replace(/[^,\d]/g, "").toString(),
-    split = number_string.split(","),
-    sisa = split[0].length % 3,
-    hrg_beli = split[0].substr(0, sisa),
-    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+// function formatRupiah(angka, prefix) {
+//   var number_string = angka.replace(/[^,\d]/g, "").toString(),
+//     split = number_string.split(","),
+//     sisa = split[0].length % 3,
+//     hrg_beli = split[0].substr(0, sisa),
+//     ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-  // tambahkan titik jika yang di input sudah menjadi angka ribuan
-  if (ribuan) {
-    separator = sisa ? "." : "";
-    hrg_beli += separator + ribuan.join(".");
-  }
+//   // tambahkan titik jika yang di input sudah menjadi angka ribuan
+//   if (ribuan) {
+//     separator = sisa ? "." : "";
+//     hrg_beli += separator + ribuan.join(".");
+//   }
 
-  hrg_beli = split[1] != undefined ? hrg_beli + "," + split[1] : hrg_beli;
-  return prefix == undefined ? hrg_beli : hrg_beli ? "" + hrg_beli : "";
-}
+//   hrg_beli = split[1] != undefined ? hrg_beli + "," + split[1] : hrg_beli;
+//   return prefix == undefined ? hrg_beli : hrg_beli ? "" + hrg_beli : "";
+// }
 
 $("#dtStatic").DataTable({
   "responsive": true, 
@@ -638,7 +639,10 @@ $(document).on('click', '.clickInv', function() {
     var uom = $(this).attr('data-uom');
     var merk = $(this).attr('data-merk');
     var ket = $(this).attr('data-ket');
-    var hrg_sat = $(this).attr('data-hrg_sat');
+    var qty_temp = $(this).attr('data-qty');
+    var nilai = $(this).attr('data-nilai');
+    var hrg_beli = nilai/qty_temp;
+    var hrg_beli_x = parseFloat(hrg_beli.toFixed(4));
     
     $('#id').val(id);
     $('#kd_brg').val(kdbrg);
@@ -648,7 +652,8 @@ $(document).on('click', '.clickInv', function() {
     $('#uom').val(uom);
     $('#merk').val(merk);
     $('#ket').val(ket);
-    $('#hrg_beli').val(hrg_sat);
+    $('#qty_temp').val(qty_temp);
+    $('#hrg_beli').val(hrg_beli_x);
     $('#modInv').modal('hide');
 });
 

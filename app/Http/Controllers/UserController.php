@@ -5747,12 +5747,12 @@ class UserController extends Controller
                                             sum(e.low)+sum(e.middle)+sum(e.high) as totalQty,
                                             round(sum(e.lowVol)+sum(e.middleVol)+sum(e.highVol),2) as totalVol
                                         FROM (SELECT a.lokasi_tpn as lokasiTpn, a.jns_kayu,
-                                              CASE WHEN a.kelas = '40-49' THEN 1 ELSE 0 END as low,
-                                              CASE WHEN a.kelas = '40-49' THEN a.vol ELSE 0 END as lowVol,
-                                              CASE WHEN a.kelas = '50-59' THEN 1 ELSE 0 END as middle,
-                                              CASE WHEN a.kelas = '50-59' THEN a.vol ELSE 0 END as middleVol,
-                                              CASE WHEN a.kelas = '60 Up' THEN 1 ELSE 0 END as high,
-                                              CASE WHEN a.kelas = '60 Up' THEN a.vol ELSE 0 END as highVol
+                                                  CASE WHEN a.kelas = '40-49' THEN 1 ELSE 0 END as low,
+                                                  CASE WHEN a.kelas = '40-49' THEN a.vol ELSE 0 END as lowVol,
+                                                  CASE WHEN a.kelas = '50-59' THEN 1 ELSE 0 END as middle,
+                                                  CASE WHEN a.kelas = '50-59' THEN a.vol ELSE 0 END as middleVol,
+                                                  CASE WHEN a.kelas = '60 Up' THEN 1 ELSE 0 END as high,
+                                                  CASE WHEN a.kelas = '60 Up' THEN a.vol ELSE 0 END as highVol
                                               FROM tr_detail_tpn_in a WHERE a.position = 'current' and a.tgl_input_tpn <= '$eDt'
                                               UNION ALL
                                               SELECT tdp.to_lokasi as lokasiTpn, tdti.jns_kayu as kode_kayu,

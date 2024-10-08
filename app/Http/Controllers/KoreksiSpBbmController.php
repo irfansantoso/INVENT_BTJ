@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProcessGlobalController;
+use App\Http\Controllers\ProcessQtyController;
 use App\Models\TrHeaderKoreksiSpBbm;
 use App\Models\TrDetailKoreksiSpBbm;
 use App\Models\StInvent;
@@ -55,7 +57,7 @@ class KoreksiSpBbmController extends Controller
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode'];
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_ref'], 11, 4);
+            $nourut = substr($jsonz[0]['no_ref'], 8, 4);
             $nourut++;
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -82,7 +84,7 @@ class KoreksiSpBbmController extends Controller
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode']."/";
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_koreksi'],  14, 4);
+            $nourut = substr($jsonz[0]['no_koreksi'],  11, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -96,6 +98,14 @@ class KoreksiSpBbmController extends Controller
     {
         $headerKoreksiSpBbm =  TrHeaderKoreksiSpBbm::all();
         $supplier = Supplier::all();
+
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
 
         $data['title'] = 'Header Koreksi Sparepart & BBM';
         return view('transaction/pengeluaran_spbbm/trHeaderKoreksiSpBbm', $data, compact('headerKoreksiSpBbm','supplier'));
@@ -163,7 +173,11 @@ class KoreksiSpBbmController extends Controller
             'user_created' => Auth::user()->name
         ]);
         $trHeaderKoreksiSpBbm->save();
-        return redirect()->route('trHeaderKoreksiSpBbm')->with('success', 'Tambah data sukses!');
+        $getIdHead = DB::table('tr_header_k_sp_bbm')
+                    ->select('*')->where('no_ref',$request->no_ref)
+                    ->get();
+        $jdIdHead = json_decode($getIdHead, true);
+        return redirect()->route('trDetailKoreksiSpBbm')->with('success', 'Tambah data header sukses!');
     }
 
     public function trHeaderKoreksiSpBbmDestroy_del(Request $request)
@@ -237,6 +251,13 @@ class KoreksiSpBbmController extends Controller
             return redirect('/');
         }else{
             $trDetailKoreksiSpBbm->save();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return redirect()->route('trDetailKoreksiSpBbm',[$request->id_head_k_spbbm])->with('success', 'Tambah data sukses!');
         }
     }
@@ -258,7 +279,15 @@ class KoreksiSpBbmController extends Controller
                             'updated_at' => date('Y-m-d H:i:s'),
                             ]);
         // return redirect()->route('trDetailKoreksiSpBbm',[$request->id_head_k_spbbm])->with('success', 'Ubah data sukses!');
-                  return back()->with('success',' Ubah data successfully');
+
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
+        return back()->with('success',' Ubah data successfully');
 
     }
 
@@ -270,6 +299,13 @@ class KoreksiSpBbmController extends Controller
             return back()->with('error',' Failed, data tidak ada!');
         }else{
             TrDetailKoreksiSpBbm::find($request->del_id)->delete();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return back()->with('success',' Data deleted successfully');
         }
 
@@ -278,7 +314,7 @@ class KoreksiSpBbmController extends Controller
     public function stInvKoreksiSpBbm_data(Request $request)
     {
         // $data = StInvent::query();
-      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_sat FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
+      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,CAST(temp_qty.qty AS DECIMAL(10,2)) as qty,CAST(temp_qty.nilai AS DECIMAL(14,2)) as nilai, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_sat FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
           LEFT JOIN mstr_jnsalat_merk ON tr_invent_stock.kel_brg = mstr_jnsalat_merk.kode_jnsAlatMerk LEFT JOIN tr_detail_saldo_awal ON tr_invent_stock.kd_brg = tr_detail_saldo_awal.kd_brg) as tis"));
       // $data = StInvent::leftJoin('temp_qty as tq', 'tq.kd_brg','=','tr_invent_stock.kd_brg')
       //                               ->get(['tr_invent_stock.*','tq.qty as qty']);
@@ -297,6 +333,8 @@ class KoreksiSpBbmController extends Controller
                                             data-uom="'.$data->uom.'"
                                             data-merk="'.$data->merk.'"
                                             data-ket="'.$data->ket.'"
+                                            data-qty="'.$data->qty.'"
+                                            data-nilai="'.$data->nilai.'"
                                             data-hrg_sat="'.$data->hrg_sat.'"
                                     class="btn btn-primary btn-sm clickInv" title="pilih">PILIH</a>';
                     }else{

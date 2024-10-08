@@ -25,9 +25,11 @@
         <ul class="nav nav-pills nav-sidebar text-sm nav-child-indent flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+          @auth
+          @if(Auth::user()->level != "logisticUser")
           <li class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian','supplier','warehouse','merkBrg') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
-            <a href="#" class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian','supplier','warehouse','merkBrg') ? 'nav-link active' : 'nav-link' }}">
-              <i class="nav-icon fas fa-cogs"></i>
+            <a href="#" class="{{ request()->is('lokasi', 'jnsAlat','jnsAlat_tambah','fixedAsset', 'aktivitasAlat','sts_pemakaian','supplier','warehouse','merkBrg') ? 'nav-link active' : 'nav-link' }} zoominout">
+              <i class="nav-icon fas fa-cogs zoominout_act"></i>
               <p>
                 Master
                 <i class="right fas fa-angle-left"></i>
@@ -84,11 +86,12 @@
               </li>
             </ul>
           </li>
-          
+          @endif
+          @endauth
         
-          <li class="{{ request()->is('trHeaderPb','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderReturPemakaian','trDetailReturPemakaian/*','trHeaderKoreksiSo','trDetailKoreksiSo/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trDetailPinGudSpBbm/*','trHeaderRetPemSpBbm','trDetailRetPemSpBbm/*','trHeaderKoreksiSpBbm','trDetailKoreksiSpBbm/*','trHeaderPemakaianBbm','trDetailPemBbm/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
-            <a href="#" class="{{ request()->is('trHeaderPb','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderReturPemakaian','trDetailReturPemakaian/*','trHeaderKoreksiSo','trDetailKoreksiSo/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trDetailPinGudSpBbm/*','trHeaderRetPemSpBbm','trDetailRetPemSpBbm/*','trHeaderKoreksiSpBbm','trDetailKoreksiSpBbm/*','trHeaderPemakaianBbm','trDetailPemBbm/*','stInvent','trHistory','periodeOperasional','users') ? 'nav-link active' : 'nav-link' }}">
-              <i class="nav-icon fas fa-book"></i>
+          <li class="{{ request()->is('trHeaderPb','trDetailPb/*','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderReturPemakaian','trDetailReturPemakaian/*','trHeaderKoreksiSo','trDetailKoreksiSo/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trDetailPinGudSpBbm/*','trHeaderRetPemSpBbm','trDetailRetPemSpBbm/*','trHeaderKoreksiSpBbm','trDetailKoreksiSpBbm/*','trHeaderPemakaianBbm','trDetailPemBbm/*','histPemakaian','stInvent','periodeOperasional','users') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+            <a href="#" class="{{ request()->is('trHeaderPb','trDetailPb/*','trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderReturPemakaian','trDetailReturPemakaian/*','trHeaderKoreksiSo','trDetailKoreksiSo/*','trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trDetailPinGudSpBbm/*','trHeaderRetPemSpBbm','trDetailRetPemSpBbm/*','trHeaderKoreksiSpBbm','trDetailKoreksiSpBbm/*','trHeaderPemakaianBbm','trDetailPemBbm/*','histPemakaian','stInvent','periodeOperasional','users') ? 'nav-link active' : 'nav-link' }} zoominout">
+              <i class="nav-icon fas fa-book zoominout_act"></i>
               <p>
                 Inputan
                 <i class="fas fa-angle-left right"></i>
@@ -96,11 +99,13 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ route('trHeaderPb') }}" class="{{ request()->is('trHeaderPb') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('trHeaderPb') }}" class="{{ request()->is('trHeaderPb','trDetailPb/*') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Input PB</p>
                 </a>
               </li>
+              @auth
+              @if(Auth::user()->level != "logisticUser")
               <li class="{{ request()->is('trHeaderPindahGudang','trDetailPindahGudang/*','trHeaderReturPemakaian','trDetailReturPemakaian/*','trHeaderKoreksiSo','trDetailKoreksiSo/*') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
                 <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -122,11 +127,12 @@
                   <li class="nav-item">
                     <a href="{{ route('trHeaderKoreksiSo') }}" class="{{ request()->is('trHeaderKoreksiSo','trDetailKoreksiSo/*') ? 'nav-link active' : 'nav-link' }}">
                       <i class="far fa-circle nav-icon"></i>
-                      <p>19 - Koreksi </p>
+                      <p>19 - Koreksi SO </p>
                     </a>
                   </li>                
                 </ul>
-              </li>
+              </li>              
+
               <li class="{{ request()->is('trHeaderPemakaianSpBbm','trDetailPemSpBbm/*','trHeaderPinGudSpBbm','trDetailPinGudSpBbm/*','trHeaderRetPemSpBbm','trDetailRetPemSpBbm/*','trHeaderKoreksiSpBbm','trDetailKoreksiSpBbm/*') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
                 <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -154,7 +160,7 @@
                   <li class="nav-item">
                     <a href="{{ route('trHeaderKoreksiSpBbm') }}" class="{{ request()->is('trHeaderKoreksiSpBbm','trDetailKoreksiSpBbm/*') ? 'nav-link active' : 'nav-link' }}">
                       <i class="far fa-circle nav-icon"></i>
-                      <p>29 - Koreksi </p>
+                      <p>29 - Koreksi SO </p>
                     </a>
                   </li>           
                 </ul>
@@ -173,12 +179,19 @@
                   </li>                  
                 </ul>
               </li>
-              
+              @endif
+              @endauth
               <hr>
+              <li class="nav-item">
+                <a href="{{ route('histPemakaian') }}" class="{{ request()->is('histPemakaian') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>History Pemakaian</p>
+                </a>
+              </li>
               <li class="nav-item">
                 <a href="{{ route('stInvent') }}" class="{{ request()->is('stInvent') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Stock Invent</p>
+                  <p>Inventory List</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -188,17 +201,19 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('trHistory') }}" class="{{ request()->is('trHistory') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('processGlobal') }}" class="{{ request()->is('processGlobal') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>History</p>
+                  <p>Process Global</p>
                 </a>
-              </li>
+              </li>              
               <li class="nav-item">
                 <a href="{{ route('periodeOperasional') }}" class="{{ request()->is('periodeOperasional') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Periode Operasional</p>
                 </a>
               </li>
+              
+
               @auth
               @if(Auth::user()->level == "administrator")
               <li class="nav-item">
@@ -206,66 +221,114 @@
                   <i class="far fa-circle nav-icon"></i>
                   <p>Users</p>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a href="admin/index3.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Dashboard v3</p>
-                </a>
-              </li>
+              </li>              
               @endif
               @endauth
             </ul>
           </li>
-          <li class="{{ request()->is('rptStokKayu','rptChainTrack','rptLoglistLoc','rptStokLoc','rptRekapHauling','rptRekapTkg','rptStokAkhGab') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
-            <a href="#" class="{{ request()->is('rptStokKayu','rptChainTrack','rptLoglistLoc','rptStokLoc','rptRekapHauling','rptRekapTkg','rptStokAkhGab') ? 'nav-link active' : 'nav-link' }}">
-              <i class="nav-icon fas fa-sticky-note"></i>
+          <li class="{{ request()->is('spRekMuStok','spRincMuStok','spPenerimaan','spRekPemPerUnit','spRincPemPerUnit','spInventaris','spChainsawman','spMoving') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+            <a href="#" class="{{ request()->is('spRekMuStok','spRincMuStok','spPenerimaan','spRekPemPerUnit','spRincPemPerUnit','spInventaris','spChainsawman','spMoving') ? 'nav-link active' : 'nav-link' }} zoominout">
+              <i class="nav-icon fas fa-tools zoominout_act"></i>
               <p>
-                Laporan
+                Laporan SparePart
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ route('rptStokKayu') }}" class="{{ request()->is('rptStokKayu') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spRekMuStok') }}" class="{{ request()->is('spRekMuStok') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Stok Kayu</p>
+                  <p>SP Rekap Mutasi Stok</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('rptChainTrack') }}" class="{{ request()->is('rptChainTrack') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spRincMuStok') }}" class="{{ request()->is('spRincMuStok') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Cs - Traktor - Kupas</p>
+                  <p>SP Rincian Mutasi Stok</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('rptLoglistLoc') }}" class="{{ request()->is('rptLoglistLoc') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spPenerimaan') }}" class="{{ request()->is('spPenerimaan') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Loglist</p>
+                  <p>SP Penerimaan</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('rptStokLoc') }}" class="{{ request()->is('rptStokLoc') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spRekPemPerUnit') }}" class="{{ request()->is('spRekPemPerUnit') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Stok Lokasi</p>
+                  <p>SP Rekap Pemakaian Perunit</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('rptRekapHauling') }}" class="{{ request()->is('rptRekapHauling') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spRincPemPerUnit') }}" class="{{ request()->is('spRincPemPerUnit') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Rekap Hauling</p>
+                  <p>SP Rincian Pemakaian Per Unit</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('rptRekapTkg') }}" class="{{ request()->is('rptRekapTkg') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spInventaris') }}" class="{{ request()->is('spInventaris') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Rekap Tongkang</p>
+                  <p>SP Inventaris</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('rptStokAkhGab') }}" class="{{ request()->is('rptStokAkhGab') ? 'nav-link active' : 'nav-link' }}">
+                <a href="{{ route('spChainsawman') }}" class="{{ request()->is('spChainsawman') ? 'nav-link active' : 'nav-link' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Stok Akhir Gabungan</p>
+                  <p>SP Chainsawman</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('spMoving') }}" class="{{ request()->is('spMoving') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>SP Moving Status</p>
+                </a>
+              </li>              
+            </ul>
+          </li>
+
+          <li class="{{ request()->is('bbmRekMuStok','bbmPenerimaan','bbmRekPemPerUnit','bbmBantuan','bbmRincPemPerUnit','bbmRincPemPerUnitPerHari') ? 'nav-item has-treeview menu-open' : 'nav-item' }}">
+            <a href="#" class="{{ request()->is('bbmRekMuStok','bbmPenerimaan','bbmRekPemPerUnit','bbmBantuan','bbmRincPemPerUnit','bbmRincPemPerUnitPerHari') ? 'nav-link active' : 'nav-link' }} zoominout">
+              <i class="nav-icon fas fa-gas-pump zoominout_act"></i>
+              <p>
+                Laporan BBM
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">              
+              <li class="nav-item">
+                <a href="{{ route('bbmRekMuStok') }}" class="{{ request()->is('bbmRekMuStok') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>BBM Rekap Mutasi Stok</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('bbmPenerimaan') }}" class="{{ request()->is('bbmPenerimaan') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>BBM Penerimaan</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('bbmRekPemPerUnit') }}" class="{{ request()->is('bbmRekPemPerUnit') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>BBM Rekap Pemakaian Perunit</p>
+                </a>
+              </li>              
+              <li class="nav-item">
+                <a href="{{ route('bbmRincPemPerUnit') }}" class="{{ request()->is('bbmRincPemPerUnit') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>BBM Rincian Pemakaian Per Unit</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('bbmRincPemPerUnitPerHari') }}" class="{{ request()->is('bbmRincPemPerUnitPerHari') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>BBM Rincian Pemakaian Per Unit Per Hari</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('bbmBantuan') }}" class="{{ request()->is('bbmBantuan') ? 'nav-link active' : 'nav-link' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>BBM Bantuan</p>
                 </a>
               </li>
             </ul>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ProcessGlobalController;
+use App\Http\Controllers\ProcessQtyController;
 use App\Models\TrHeaderReturPemakaian;
 use App\Models\TrDetailReturPemakaian;
 use App\Models\StInvent;
@@ -46,7 +48,7 @@ class ReturPemakaianController extends Controller
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode']."/";
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['no_ref'], 11, 4);
+            $nourut = substr($jsonz[0]['no_ref'], 10, 4);
             $nourut++;
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -73,7 +75,7 @@ class ReturPemakaianController extends Controller
         $jsonz = json_decode($getLastNo, true);
         $newNo1 = $jsonx[0]['kode_periode']."/";
         if($getLastNo->count() > 0) {
-            $nourut = substr($jsonz[0]['retur_p'],  14, 4);
+            $nourut = substr($jsonz[0]['retur_p'],  11, 4);
             $nourut++;            
             $newNo2 = sprintf("%04s", $nourut) ;
             return $newNo1.$newNo2;
@@ -87,6 +89,13 @@ class ReturPemakaianController extends Controller
     {
         $saldoAwal =  TrHeaderReturPemakaian::all();
         $supplier = Supplier::all();
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
 
         $data['title'] = 'PENERIMAAN | RETUR PEMAKAIAN';
         return view('transaction/penerimaan/trHeaderReturPemakaian', $data, compact('saldoAwal','supplier'));
@@ -215,6 +224,13 @@ class ReturPemakaianController extends Controller
             return redirect('/');
         }else{
             $trDetailReturPemakaian->save();
+            // Buat instance dari controller lain
+            $ProcessGlobalController = new ProcessGlobalController();
+            $ProcessQtyController = new ProcessQtyController();
+
+            // Panggil fungsi-fungsi yang diperlukan
+            $ProcessGlobalController->processGlobal();
+            $ProcessQtyController->processQty();
             return redirect()->route('trDetailReturPemakaian',[$request->id_head_retur_pemakaian])->with('success', 'Tambah data sukses!');
         }
     }
@@ -238,7 +254,15 @@ class ReturPemakaianController extends Controller
                             'updated_at' => date('Y-m-d H:i:s'),
                             ]);
         // return redirect()->route('trDetailReturPemakaian',[$request->id_head_retur_pemakaian])->with('success', 'Ubah data sukses!');
-                  return back()->with('success',' Ubah data successfully');
+                  
+        // Buat instance dari controller lain
+        $ProcessGlobalController = new ProcessGlobalController();
+        $ProcessQtyController = new ProcessQtyController();
+
+        // Panggil fungsi-fungsi yang diperlukan
+        $ProcessGlobalController->processGlobal();
+        $ProcessQtyController->processQty();
+        return back()->with('success',' Ubah data successfully');
 
     }
 
@@ -258,7 +282,7 @@ class ReturPemakaianController extends Controller
     public function stInvReturPemakaian_data(Request $request)
     {
         // $data = StInvent::query();
-      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,temp_qty.qty as qty, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_sat FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
+      $data = DB::table(DB::raw("(SELECT tr_invent_stock.*,CAST(temp_qty.qty AS DECIMAL(10,2)) as qty,CAST(temp_qty.nilai AS DECIMAL(14,2)) as nilai, mstr_jnsalat_merk.keterangan as ket, tr_detail_saldo_awal.harga_satuan as hrg_sat FROM tr_invent_stock LEFT JOIN temp_qty ON tr_invent_stock.kd_brg = temp_qty.kd_brg
           LEFT JOIN mstr_jnsalat_merk ON tr_invent_stock.kel_brg = mstr_jnsalat_merk.kode_jnsAlatMerk LEFT JOIN tr_detail_saldo_awal ON tr_invent_stock.kd_brg = tr_detail_saldo_awal.kd_brg) as tis"));
       // $data = StInvent::leftJoin('temp_qty as tq', 'tq.kd_brg','=','tr_invent_stock.kd_brg')
       //                               ->get(['tr_invent_stock.*','tq.qty as qty']);
@@ -276,6 +300,8 @@ class ReturPemakaianController extends Controller
                                         data-uom="'.$data->uom.'"
                                         data-merk="'.$data->merk.'"
                                         data-ket="'.$data->ket.'"
+                                        data-qty="'.$data->qty.'"
+                                        data-nilai="'.$data->nilai.'"
                                         data-hrg_sat="'.$data->hrg_sat.'"
                                 class="btn btn-primary btn-sm clickInv" title="pilih">PILIH</a>';
                     return $btn;

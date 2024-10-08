@@ -51,7 +51,8 @@
             <select class="form-control" name="level" id="level" style="width: 20%;">
               <option selected="selected">-- Level --</option>
                 <option value="administrator">Administrator</option>
-                <option value="user">User</option>
+                <option value="user">Basic User</option>
+                <option value="logisticUser">Logistic User</option>
             </select>
           </div>
         </div>

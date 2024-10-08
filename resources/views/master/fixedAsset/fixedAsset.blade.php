@@ -13,8 +13,10 @@
       <!-- /.card-header -->
       <!-- form start -->
       
-      <form class="form-horizontal" action="{{ route('fixedAsset.add') }}" method="POST">
+      <form id="formAuthentication" class="form-horizontal">
         @csrf
+        <!-- Tambahkan metode spoof PUT untuk update, diatur secara dinamis dengan JS -->
+        <input type="hidden" name="_method" id="formMethod" value="POST">
         <div class="card-body">
           <div class="form-group row">
             <label for="account" class="col-sm-2 col-form-label">Kode</label>
@@ -47,6 +49,7 @@
           <tr>
             <th>Kode </th>
             <th>Nama Fixed Asset</th>
+            <th>Action</th>
           </tr>
           </thead>
           <tbody>
@@ -54,6 +57,10 @@
             <tr>              
                 <td>{{ $fa->kode_fa }}</td>
                 <td>{{ $fa->nama_fa }}</td>
+                <td>
+                  <!-- Add Edit button -->
+                  <a href="#" data-toggle="modal" data-target="#modal-edit" data-id="{{ $fa->id_fa }}" data-kodefa="{{ $fa->kode_fa }}" data-namafa="{{ $fa->nama_fa }}" class="btn btn-dark btn-sm editFa" title="Edit">Edit</a>
+                </td>
             </tr>
             @endforeach                     
           </tbody>
@@ -63,4 +70,38 @@
       <!-- /.card-body -->
     </div>    
     <!-- /.card -->
-@endsection
+
+    <!-- Modal EDiT Show -->
+    <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="modal-edit" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+            <div class="modal-content">
+                <div class="modal-header">Edit Form
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="editForm"></div>           
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal EDiTShow -->
+@stop
+@section('custom-js')
+<script>
+  $(document).on('click', '.editFa', function() {
+      let id = $(this).attr('data-id');
+
+      $.ajax({
+          type: 'GET',
+          url: "{{ URL::to('fixedAsset/showedit')}}"+"/"+id
+      }).done( function( response ) {
+          $('#editForm').html(response.html);
+      });
+  });
+</script>
+
+
+@stop

@@ -28,7 +28,7 @@
          @csrf        
         <input type="hidden" name="id_header_saldo_awal" id="id_header_saldo_awal" value="{{ $getHeaderSa->id }}">
         <input type="hidden" name="no_ref" id="no_ref" value="{{ $getHeaderSa->no_ref }}">
-        <input type="hidden" name="tgl_sa" id="tgl_sa" value="{{ $getHeaderSa->tgl_sa }}">
+        <input type="hidden" name="tgl_det_sa" id="tgl_det_sa" value="{{ $getHeaderSa->tgl_sa }}">
         <input type="hidden" name="no_sppb" id="no_sppb" value="{{ $getHeaderSa->no_sppb }}">
         <input type="hidden" name="supplier" id="supplier" value="{{ $getHeaderSa->supplier }}">
         <input type="hidden" name="kode_periode" id="kode_periode" value="{{ $getHeaderSa->kode_periode }}">
@@ -117,7 +117,7 @@
             <div class="col-sm-2">
               <div class="form-group">
                 <label>Harga Satuan</label>
-                  <input type="number" class="form-control" id="harga_satuan" name="harga_satuan">
+                  <input type="number" class="form-control" id="harga_satuan" name="harga_satuan" step="0.01">
               </div>
             </div>
             <div class="col-sm-2">
@@ -180,6 +180,15 @@
             </tr>
             @endforeach                     
           </tbody>
+          <tfoot>
+            <tr>
+                <th colspan="3">Total :</th>
+                <th id="totalJumlah"></th>
+                <th id="totalSatuan"></th>
+                <th id="totalTotal"></th>
+                <th colspan="2"></th> <!-- Colspan to match the number of columns -->
+            </tr>
+          </tfoot>
         </table>
       </div>
       <!-- /.card-body -->
@@ -302,6 +311,34 @@ $("#trDetailPindahGudang").DataTable({
   "order": [],
   "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
 }).buttons().container().appendTo('#trDetailPindahGudang_wrapper .col-md-6:eq(0)');
+
+// Start Calculate and display total sum ---------------------------
+var table = $('#trDetailPindahGudang').DataTable();
+var total = table.column(3).data().reduce(function (acc, val) {
+    return acc + parseFloat(val);
+}, 0);
+$('#totalJumlah').text(total);
+
+var totalSatuan = table.column(4).data().reduce(function (acc, val) {
+    // Remove thousand separators and replace comma with dot, then parse as float
+    var number = parseFloat(val.replace(/\./g, '').replace(',', '.'));
+    return acc + number;
+}, 0);
+$('#totalSatuan').text(formatNumber(totalSatuan));
+
+var totalTotal = table.column(5).data().reduce(function (acc, val) {
+    // Remove thousand separators and replace comma with dot, then parse as float
+    var number = parseFloat(val.replace(/\./g, '').replace(',', '.'));
+    return acc + number;
+}, 0);
+$('#totalTotal').text(formatNumber(totalTotal));
+
+// Function to format number with commas and periods
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Stop Calculate and display total sum -----------------------------
 
 $(function () {
   $("#qty , #harga_satuan").keyup(function () {
