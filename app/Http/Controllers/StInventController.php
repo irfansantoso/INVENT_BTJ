@@ -10,12 +10,14 @@ use App\Models\GabJnsAlatMerk;
 use App\Models\GabJnsAlatMerk2;
 use App\Models\MerkBrg;
 use App\Models\ProcessQty;
+use App\Exports\ExportPrintStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Session;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StInventController extends Controller
 {
@@ -214,6 +216,33 @@ class StInventController extends Controller
             DB::rollback();
             return back()->with('error',' There is some problem, please try again or call your admin!');
         }
+    }
+
+    public function printStock_rpt($jnsInvent)
+    { 
+        
+
+        $query = "SELECT a.*, temp_qty.qty as qty, temp_qty.lock_pb as lockPb 
+              FROM tr_invent_stock a 
+              LEFT JOIN temp_qty ON a.kd_brg = temp_qty.kd_brg";
+
+        if ($jnsInvent == 'bbm') {
+            $query .= " WHERE a.kel_brg = 'MP991'";
+            $jnsInv = "BBM";
+        } else {
+            $query .= " WHERE a.kel_brg <> 'MP991'";
+            $jnsInv = "SPAREPARTS";
+        }
+
+        $query .= " ORDER BY a.kd_brg ASC";
+
+        $data = DB::select(DB::raw($query));
+        $array = json_decode(json_encode($data), true);                                    
+
+        // $pdf = PDF::loadView('reporting/rpt_printStock',['dataStock' => $data]);
+        // return $pdf->download('STOK_INVENT_Hingga_'.date('Y-m-d_H-i-s').'.pdf');
+        $fileNm = "STOK_INVENT_".$jnsInv."_BTJ_Hingga_".date('Y-m-d').".xlsx";
+        return Excel::download(new ExportPrintStock($array), $fileNm);
     }
 
     public function stInvent_openlock(Request $request)

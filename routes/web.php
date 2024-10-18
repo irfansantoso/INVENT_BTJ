@@ -239,6 +239,7 @@ Route::post('stInvent', [StInventController::class, 'stInvent_add'])->name('stIn
 Route::post('stInvent/edit', [StInventController::class, 'stInvent_edit'])->name('stInvent.edit')->middleware('auth');
 Route::post('stInvent/delete/', [StInventController::class, 'stInvent_del'])->name('stInvent.del')->middleware('auth');
 Route::post('stInvent/openlock/', [StInventController::class, 'stInvent_openlock'])->name('stInvent.openlock')->middleware('auth');
+Route::get('stInvent/printStock/{jnsInvent}', [StInventController::class, 'printStock_rpt'])->name('printStock')->middleware('auth');
 
 Route::get('processQty',[ProcessQtyController::class, 'processQty'])->name('processQty')->middleware('auth');
 Route::get('processGlobal',[ProcessGlobalController::class, 'processGlobal'])->name('processGlobal')->middleware('auth');

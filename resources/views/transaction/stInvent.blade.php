@@ -95,7 +95,12 @@
         </div>
         <div class="card-footer">
           <button class="btn btn-success">Simpan</button>
-        </div>
+        </div> 
+        <div style="text-align: center;">
+          <a href="{{ url('stInvent/printStock/sparepart') }}" style="background: royalblue;!important" class="btn btn-primary" title="Cetak">Cetak Spareparts</a>
+          <a href="{{ url('stInvent/printStock/bbm') }}" style="background: green;!important" class="btn btn-primary" title="Cetak">Cetak BBM</a>
+        </div>        
+        
         <!-- /.card-footer -->
       </form>              
     </div>
